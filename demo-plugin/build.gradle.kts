@@ -45,4 +45,5 @@ dependencies {
     implementation         ("org.spigotmc:spigot:$bukkitVersion")
     annotationProcessor    ("org.projectlombok:lombok:$lombokVersion")
     compileOnly            ("org.projectlombok:lombok:$lombokVersion")
+    implementation         (rootProject)
 }

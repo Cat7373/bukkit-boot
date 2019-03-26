@@ -1,0 +1,5 @@
+name: Cat-Base-Demo
+version: @version@
+main: org.cat73.demoplugin.CatBaseDemo
+authors: [Cat73]
+website: https://github.com/Cat7373/Cat-Base
