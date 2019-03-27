@@ -97,8 +97,10 @@ public final class PluginContextManager {
     private static void createBeans() {
         // 遍历插件
         forEachPlugins(context -> {
-            // 循环创建 Bean
             Map<Class<?>, Object> beans = new HashMap<>();
+            // 注册插件主类
+            beans.put(context.getPlugin().getClass(), context.getPlugin());
+            // 循环创建 Bean
             for (Class<?> clazz : context.getPluginAnnotation().classes()) {
                 createBean(clazz, beans);
             }
