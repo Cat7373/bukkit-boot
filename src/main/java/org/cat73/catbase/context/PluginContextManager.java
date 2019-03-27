@@ -1,9 +1,6 @@
 package org.cat73.catbase.context;
 
-import org.bukkit.Bukkit;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginManager;
 import org.cat73.catbase.CatBase;
 import org.cat73.catbase.annotation.Bean;
 import org.cat73.catbase.annotation.CatPlugin;
@@ -15,9 +12,7 @@ import org.cat73.catbase.util.reflect.Scans;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.security.ProtectionDomain;
 import java.util.Collections;
 import java.util.HashMap;
@@ -143,7 +138,7 @@ public final class PluginContextManager {
         // 遍历 Bean
         forEachBeans((context, bean) -> {
             // 搜索并遍历包含注入注解的字段
-            for (Field field : Reflects.findDeclaredFieldByAnnotation(bean.getClass(), Inject.class)) {
+            Reflects.forEachDeclaredFieldByAnnotation(bean.getClass(), Inject.class, (field, annotation) -> {
                 // 根据类型搜索注入的属性
                 Class<?> type = field.getType();
                 Object injectBean = context.resolveBean(type);
@@ -161,7 +156,7 @@ public final class PluginContextManager {
                 } catch (IllegalAccessException e) {
                     throw Lang.noImplement();
                 }
-            }
+            });
         });
     }
 
@@ -175,14 +170,10 @@ public final class PluginContextManager {
      * </ul>
      */
     private static void autoRegister() {
-        PluginManager pluginManager = Bukkit.getServer().getPluginManager();
-
         // 遍历 Bean
         forEachBeans((context, bean) -> {
-            // 注册 EventListener
-            if (bean instanceof Listener) {
-                pluginManager.registerEvents((Listener) bean, context.getPlugin());
-            }
+            context.getListenerManager().register(context, bean);
+            context.getScheduleManager().register(context, bean);
         });
     }
 
@@ -193,14 +184,14 @@ public final class PluginContextManager {
         // 遍历 Bean
         forEachBeans((context, bean) -> {
             // 搜索并遍历包含初始化注解的方法
-            for (Method method : Reflects.findMethodByAnnotation(bean.getClass(), PostConstruct.class)) {
+            Reflects.forEachMethodByAnnotation(bean.getClass(), PostConstruct.class, (method, annotation) -> {
                 // 调用初始化方法
                 try {
                     method.invoke(bean);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     throw Lang.wrapThrow(e);
                 }
-            }
+            });
         });
     }
 

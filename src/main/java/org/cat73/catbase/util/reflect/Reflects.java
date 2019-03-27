@@ -9,8 +9,6 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 反射工具类
@@ -21,9 +19,13 @@ public final class Reflects {
     }
 
     /**
-     * NMS 的版本
+     * 当前正运行的服务器的 NMS 版本的名字
      **/
-    public static final String NMS_VERSION = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+    public static final String CURRENT_NMS_VERSION_NAME = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+    /**
+     * 当前正运行的服务器的 NMS 版本
+     **/
+    public static final NMSVersion CURRENT_NMS_VERSION = NMSVersion.valueOf(CURRENT_NMS_VERSION_NAME);
 
     // TODO javadoc
     @SuppressWarnings("unchecked")
@@ -37,29 +39,25 @@ public final class Reflects {
     }
 
     // TODO javadoc
-    @Nonnull
-    public static List<Field> findDeclaredFieldByAnnotation(@Nonnull Class<?> clazz, @Nonnull Class<? extends Annotation> annotationClazz) {
-        List<Field> result = new ArrayList<>();
+    public static <T extends Annotation> void forEachDeclaredFieldByAnnotation(@Nonnull Class<?> clazz, @Nonnull Class<T> annotationClazz, Lang.ThrowableBiConsumer<Field, T> action) {
         for (Field field : clazz.getDeclaredFields()) {
-            if (field.isAnnotationPresent(annotationClazz)) {
+            T annotation = field.getAnnotation(annotationClazz);
+            if (annotation != null) {
                 trySetAccessible(field);
-                result.add(field);
+                action.wrap().accept(field, annotation);
             }
         }
-        return result;
     }
 
     // TODO javadoc
-    @Nonnull
-    public static List<Method> findMethodByAnnotation(@Nonnull Class<?> clazz, @Nonnull Class<? extends Annotation> annotationClazz) {
-        List<Method> result = new ArrayList<>();
+    public static <T extends Annotation> void forEachMethodByAnnotation(@Nonnull Class<?> clazz, @Nonnull Class<T> annotationClazz, Lang.ThrowableBiConsumer<Method, T> action) {
         for (Method method : clazz.getMethods()) {
-            if (method.isAnnotationPresent(annotationClazz)) {
+            T annotation = method.getAnnotation(annotationClazz);
+            if (annotation != null) {
                 trySetAccessible(method);
-                result.add(method);
+                action.wrap().accept(method, annotation);
             }
         }
-        return result;
     }
 
     // TODO javadoc

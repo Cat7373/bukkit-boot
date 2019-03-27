@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import org.bukkit.plugin.Plugin;
 import org.cat73.catbase.annotation.CatPlugin;
+import org.cat73.catbase.listener.ListenerManager;
+import org.cat73.catbase.schedule.ScheduleManager;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -33,6 +35,10 @@ public final class PluginContext {
      * ProtectionDomain 的实例，用于标识同一个包里的类
      */
     private final ProtectionDomain protectionDomain;
+    // TODO javadoc
+    private final ListenerManager listenerManager = new ListenerManager();
+    // TODO javadoc
+    private final ScheduleManager scheduleManager = new ScheduleManager();
     /**
      * Bean 类名 -> Bean 实例
      */
@@ -40,7 +46,6 @@ public final class PluginContext {
     private Map<Class<?>, Object> beans;
 
     // TODO commandManager
-    // TODO taskManager
 
     // TODO javadoc
     @Nullable

@@ -112,7 +112,7 @@ public final class Scans {
 
     /**
      * 将一个 zip 文件路径转换为 ZIP 文件输入流
-     * @param filePath jar 文件路径
+     * @param filePath 文件路径
      * @return ZipInputStream 输入流
      * @throws IOException 如果转换过程中出现了 IO 异常
      */

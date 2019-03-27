@@ -2,7 +2,6 @@ package org.cat73.catbase.annotation;
 
 import java.lang.annotation.*;
 
-// TODO 实现
 /**
  * 根据类型自动注入
  * <p>目前仅支持按类型搜索 Bean，如果存在且仅存在一个可转换为这个类型的 Bean，则注入它，否则按注入失败处理</p>

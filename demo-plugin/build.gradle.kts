@@ -42,8 +42,8 @@ val lombokVersion =             "1.18.6"
 
 // 依赖
 dependencies {
-    implementation         ("org.bukkit:bukkit:$bukkitVersion")
+    compileOnly            ("org.bukkit:bukkit:$bukkitVersion")
     annotationProcessor    ("org.projectlombok:lombok:$lombokVersion")
     compileOnly            ("org.projectlombok:lombok:$lombokVersion")
-    implementation         (rootProject)
+    compileOnly            (rootProject)
 }
