@@ -1,13 +1,17 @@
 package org.cat73.catbase.context;
 
 import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
+import org.cat73.catbase.CatBase;
+import org.cat73.catbase.annotation.Bean;
 import org.cat73.catbase.annotation.CatPlugin;
 import org.cat73.catbase.annotation.Inject;
 import org.cat73.catbase.annotation.PostConstruct;
-import org.cat73.catbase.exception.InitializeError;
 import org.cat73.catbase.util.Lang;
 import org.cat73.catbase.util.reflect.Reflects;
+import org.cat73.catbase.util.reflect.Scans;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -55,8 +59,7 @@ public final class PluginContextManager {
         if (plugin2context.containsKey(plugin)) {
             return;
         }
-        CatPlugin catPlugin = plugin.getClass().getAnnotation(CatPlugin.class);
-        if (catPlugin == null) {
+        if (!plugin.getClass().isAnnotationPresent(CatPlugin.class)) {
             return;
         }
 
@@ -77,45 +80,59 @@ public final class PluginContextManager {
 
         try {
             // 步骤1 - 创建所有 Bean
-            // TODO 支持按需初始化，如 @NMSVersion
             createBeans();
 
             // 步骤2 - 执行自动依赖注入
             injectionDependencies();
 
-            // TODO 执行自动注册(如命令、定时任务、Listener
+            // 步骤3 - 执行自动注册
+            autoRegister();
 
-            // 调用各个实例的初始化方法
+            // 步骤4 - 调用各个实例的初始化方法
             invokePostConstructs();
         } catch (Exception e) {
-            throw startupFail("启动失败", e);
+            throw CatBase.startupFail("启动失败", e);
         }
     }
 
     /**
      * 初始化 - 步骤1 - 创建所有 Bean
      */
+    // TODO 支持按需初始化，如 @NMSVersion
     private static void createBeans() {
-        // 循环遍历插件
-        for (PluginContext context : plugin2context.values()) {
+        // 遍历插件
+        forEachPlugins(context -> {
             // 循环创建 Bean
             Map<Class<?>, Object> beans = new HashMap<>();
             for (Class<?> clazz : context.getPluginAnnotation().classes()) {
-                // TODO 或许应该要求 Class 上带注解？然后就可以给起名字了
-                //   以及可能可以给默认名称
-                // 重复的 Class 跳过
-                if (clazz == null || beans.containsKey(clazz)) {
-                    continue;
-                }
-                // 创建并保存 Bean
-                try {
-                    beans.put(clazz, Reflects.newInstance(clazz));
-                } catch (Exception e) {
-                    throw startupFail("实例化 Bean %s 失败", e, clazz.getName());
+                createBean(clazz, beans);
+            }
+            // 如果启用了自动扫描，则以插件主类为引，进行自动扫描
+            if (context.getPluginAnnotation().autoScanPackage()) {
+                for (Class<?> clazz : Scans.scanClass(context.getPlugin().getClass())) {
+                    // 如果包含 @Bean 注解，则自动创建这个 Bean
+                    if (clazz.isAnnotationPresent(Bean.class)) {
+                        createBean(clazz, beans);
+                    }
                 }
             }
             // 保存 Bean 列表到 Context 中
             context.setBeans(Collections.unmodifiableMap(beans));
+        });
+    }
+
+    private static void createBean(Class<?> clazz, Map<Class<?>, Object> beans) {
+        // TODO 或许应该要求 Class 上带注解？然后就可以给起名字了
+        //   以及可能可以给默认名称
+        // 重复的 Class 跳过
+        if (clazz == null || beans.containsKey(clazz)) {
+            return;
+        }
+        // 创建并保存 Bean
+        try {
+            beans.put(clazz, Reflects.newInstance(clazz));
+        } catch (Exception e) {
+            throw CatBase.startupFail("实例化 Bean %s 失败", e, clazz.getName());
         }
     }
 
@@ -123,75 +140,83 @@ public final class PluginContextManager {
      * 初始化 - 步骤2 - 执行自动依赖注入
      */
     private static void injectionDependencies() {
-        // 循环遍历插件
-        for (PluginContext context : plugin2context.values()) {
-            // 循环遍历 Bean
-            for (Object bean : context.getBeans().values()) {
-                // 获取其字段列表
-                for (Field field : bean.getClass().getDeclaredFields()) {
-                    // 搜索注入注解
-                    Inject inject = field.getAnnotation(Inject.class);
-                    if (inject == null) {
-                        continue;
-                    }
-                    // 根据类型搜索注入的属性
-                    Class<?> type = field.getType();
-                    Object injectBean = context.resolveBean(type);
-                    if (injectBean == null) {
-                        throw startupFail("无法解决 Bean %s 的依赖 %s，其类型为 %s", null, bean.getClass().getName(), field.getName(), type.getName());
-                    }
+        // 遍历 Bean
+        forEachBeans((context, bean) -> {
+            // 搜索并遍历包含注入注解的字段
+            for (Field field : Reflects.findDeclaredFieldByAnnotation(bean.getClass(), Inject.class)) {
+                // 根据类型搜索注入的属性
+                Class<?> type = field.getType();
+                Object injectBean = context.resolveBean(type);
+                if (injectBean == null) {
+                    throw CatBase.startupFail("无法解决 Bean %s 的依赖 %s，其类型为 %s", null, bean.getClass().getName(), field.getName(), type.getName());
+                }
 
-                    // 设置权限
-                    if (!field.isAccessible()) {
-                        field.setAccessible(true);
-                    }
-                    // 注入内容
-                    try {
-                        field.set(bean, injectBean);
-                    } catch (IllegalAccessException e) {
-                        throw Lang.noImplement();
-                    }
+                // 设置权限
+                if (!field.isAccessible()) {
+                    field.setAccessible(true);
+                }
+                // 注入内容
+                try {
+                    field.set(bean, injectBean);
+                } catch (IllegalAccessException e) {
+                    throw Lang.noImplement();
                 }
             }
-        }
+        });
+    }
+
+    /**
+     * 初始化 - 步骤3 - 自动注册
+     * <p>目前支持注册：</p>
+     * <ul>
+     *     <!-- TODO <li>Command</li> -->
+     *     <li>Listener</li>
+     *     <!-- TODO <li>Task</li> -->
+     * </ul>
+     */
+    private static void autoRegister() {
+        PluginManager pluginManager = Bukkit.getServer().getPluginManager();
+
+        // 遍历 Bean
+        forEachBeans((context, bean) -> {
+            // 注册 EventListener
+            if (bean instanceof Listener) {
+                pluginManager.registerEvents((Listener) bean, context.getPlugin());
+            }
+        });
     }
 
     /**
      * 初始化 - 步骤4 - 调用初始化方法
      */
     private static void invokePostConstructs() {
-        // 循环遍历插件
-        for (PluginContext context : plugin2context.values()) {
-            // 循环遍历 Bean
-            for (Object bean : context.getBeans().values()) {
-                // 遍历方法
-                for (Method method : bean.getClass().getMethods()) {
-                    // 搜索初始化注解
-                    PostConstruct postConstruct = method.getAnnotation(PostConstruct.class);
-                    if (postConstruct == null) {
-                        continue;
-                    }
-
-                    // 调用初始化方法
-                    try {
-                        method.invoke(bean);
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        throw Lang.wrapThrow(e);
-                    }
+        // 遍历 Bean
+        forEachBeans((context, bean) -> {
+            // 搜索并遍历包含初始化注解的方法
+            for (Method method : Reflects.findMethodByAnnotation(bean.getClass(), PostConstruct.class)) {
+                // 调用初始化方法
+                try {
+                    method.invoke(bean);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw Lang.wrapThrow(e);
                 }
             }
+        });
+    }
+
+    // TODO javadoc
+    private static void forEachPlugins(@Nonnull Lang.ThrowableConsumer<PluginContext> action) {
+        for (PluginContext context : plugin2context.values()) {
+            action.wrap().accept(context);
         }
     }
 
     // TODO javadoc
-    private static Error startupFail(@Nonnull String msg, @Nullable Throwable e, @Nullable Object... args) {
-        // 停掉服务器
-        Bukkit.getServer().shutdown();
-        // 返回启动失败的异常
-        if (e == null) {
-            return new InitializeError(String.format(msg, args));
-        } else {
-            return new InitializeError(String.format(msg, args), e);
+    private static void forEachBeans(@Nonnull Lang.ThrowableBiConsumer<PluginContext, Object> action) {
+        for (PluginContext context : plugin2context.values()) {
+            for (Object bean : context.getBeans().values()) {
+                action.wrap().accept(context, bean);
+            }
         }
     }
 

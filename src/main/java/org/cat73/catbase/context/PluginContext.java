@@ -8,6 +8,7 @@ import org.bukkit.plugin.Plugin;
 import org.cat73.catbase.annotation.CatPlugin;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.security.ProtectionDomain;
 import java.util.List;
 import java.util.Map;
@@ -40,10 +41,10 @@ public final class PluginContext {
 
     // TODO commandManager
     // TODO taskManager
-    // TODO ListenerManager
 
     // TODO javadoc
-    public Object resolveBean(Class<?> clazz) {
+    @Nullable
+    public Object resolveBean(@Nonnull Class<?> clazz) {
         List<Object> resultList = this.beans.entrySet().stream()
                 .filter(e -> clazz.isAssignableFrom(e.getKey()))
                 .map(Map.Entry::getValue)
@@ -62,6 +63,7 @@ public final class PluginContext {
      * @param plugin 插件的实例
      * @return 插件的上下文
      */
+    @Nonnull
     static PluginContext valueOf(@Nonnull Plugin plugin) {
         CatPlugin pluginAnnotation = plugin.getClass().getAnnotation(CatPlugin.class);
         ProtectionDomain protectionDomain = plugin.getClass().getProtectionDomain();

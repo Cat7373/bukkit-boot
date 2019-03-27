@@ -3,6 +3,8 @@ package org.cat73.catbase.util;
 import org.bukkit.plugin.Plugin;
 import org.cat73.catbase.context.PluginContextManager;
 
+import javax.annotation.Nonnull;
+
 public final class Plugins {
     private Plugins() {
         throw new UnsupportedOperationException();
@@ -12,6 +14,7 @@ public final class Plugins {
      * 获取当前插件的实例
      * @return 当前插件的实例
      */
+    @Nonnull
     public Plugin current() {
         return PluginContextManager.current().getPlugin();
     }

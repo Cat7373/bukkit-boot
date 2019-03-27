@@ -11,9 +11,16 @@ import java.lang.annotation.*;
 @Documented
 public @interface CatPlugin {
     /**
-     * 需要注册的类列表
+     * 需要注册为 Bean 的类列表
+     * <p>作为 Bean 的 Class 必须拥有无参的构造方法</p>
      * @return 需要注册的类列表
      */
     @Nonnull
     Class<?>[] classes() default {};
+
+    /**
+     * 是否自动扫描包中的类，如果为 true，则自动扫描包中的类，并将被 @Bean 注解修饰的类自动注册为 Bean
+     * @return 是否自动扫描包中的类
+     */
+    boolean autoScanPackage() default true;
 }
