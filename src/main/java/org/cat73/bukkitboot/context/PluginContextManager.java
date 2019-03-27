@@ -1,14 +1,14 @@
-package org.cat73.catbase.context;
+package org.cat73.bukkitboot.context;
 
 import org.bukkit.plugin.Plugin;
-import org.cat73.catbase.CatBase;
-import org.cat73.catbase.annotation.Bean;
-import org.cat73.catbase.annotation.CatPlugin;
-import org.cat73.catbase.annotation.Inject;
-import org.cat73.catbase.annotation.PostConstruct;
-import org.cat73.catbase.util.Lang;
-import org.cat73.catbase.util.reflect.Reflects;
-import org.cat73.catbase.util.reflect.Scans;
+import org.cat73.bukkitboot.BukkitBoot;
+import org.cat73.bukkitboot.annotation.Bean;
+import org.cat73.bukkitboot.annotation.CatPlugin;
+import org.cat73.bukkitboot.annotation.Inject;
+import org.cat73.bukkitboot.annotation.PostConstruct;
+import org.cat73.bukkitboot.util.Lang;
+import org.cat73.bukkitboot.util.reflect.Reflects;
+import org.cat73.bukkitboot.util.reflect.Scans;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,7 +25,7 @@ public final class PluginContextManager {
     /**
      * 搜索调用树时忽略的包(框架自身)
      */
-    private static final String IGNORE_PACKAGE = "org.cat73.catbase";
+    private static final String IGNORE_PACKAGE = "org.cat73.bukkitboot";
     /**
      * 插件到上下文的缓存
      */
@@ -86,7 +86,7 @@ public final class PluginContextManager {
             // 步骤4 - 调用各个实例的初始化方法
             invokePostConstructs();
         } catch (Exception e) {
-            throw CatBase.startupFail("启动失败", e);
+            throw BukkitBoot.startupFail("启动失败", e);
         }
     }
 
@@ -129,7 +129,7 @@ public final class PluginContextManager {
         try {
             beans.put(clazz, Reflects.newInstance(clazz));
         } catch (Exception e) {
-            throw CatBase.startupFail("实例化 Bean %s 失败", e, clazz.getName());
+            throw BukkitBoot.startupFail("实例化 Bean %s 失败", e, clazz.getName());
         }
     }
 
@@ -145,7 +145,7 @@ public final class PluginContextManager {
                 Class<?> type = field.getType();
                 Object injectBean = context.resolveBean(type);
                 if (injectBean == null) {
-                    throw CatBase.startupFail("无法解决 Bean %s 的依赖 %s，其类型为 %s", null, bean.getClass().getName(), field.getName(), type.getName());
+                    throw BukkitBoot.startupFail("无法解决 Bean %s 的依赖 %s，其类型为 %s", null, bean.getClass().getName(), field.getName(), type.getName());
                 }
 
                 // 设置权限

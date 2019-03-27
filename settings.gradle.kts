@@ -1,3 +1,3 @@
-rootProject.name = "cat-base"
+rootProject.name = "bukkit-boot"
 
 include(":demo-plugin")

@@ -1,13 +1,13 @@
-package org.cat73.catbase.schedule;
+package org.cat73.bukkitboot.schedule;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.cat73.catbase.annotation.Scheduled;
-import org.cat73.catbase.context.IManager;
-import org.cat73.catbase.context.PluginContext;
-import org.cat73.catbase.util.Lang;
-import org.cat73.catbase.util.reflect.Reflects;
+import org.cat73.bukkitboot.annotation.Scheduled;
+import org.cat73.bukkitboot.context.IManager;
+import org.cat73.bukkitboot.context.PluginContext;
+import org.cat73.bukkitboot.util.Lang;
+import org.cat73.bukkitboot.util.reflect.Reflects;
 
 import javax.annotation.Nonnull;
 

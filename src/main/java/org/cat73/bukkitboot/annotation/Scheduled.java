@@ -1,4 +1,4 @@
-package org.cat73.catbase.annotation;
+package org.cat73.bukkitboot.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

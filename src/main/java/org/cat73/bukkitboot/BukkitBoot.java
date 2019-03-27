@@ -1,10 +1,10 @@
-package org.cat73.catbase;
+package org.cat73.bukkitboot;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.cat73.catbase.context.PluginContextManager;
-import org.cat73.catbase.exception.InitializeError;
+import org.cat73.bukkitboot.context.PluginContextManager;
+import org.cat73.bukkitboot.exception.InitializeError;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -12,21 +12,21 @@ import javax.annotation.Nullable;
 /**
  * 插件主类
  */
-public final class CatBase extends JavaPlugin {
+public final class BukkitBoot extends JavaPlugin {
     /**
      * 自身的实例
      */
-    private static CatBase instance;
+    private static BukkitBoot instance;
 
     /**
      * 获取自身的实例
      * @return 自身的实例
      */
-    public static CatBase instance() {
+    public static BukkitBoot instance() {
         return instance;
     }
 
-    public CatBase() {
+    public BukkitBoot() {
         // 保留自身的实例
         instance = this;
     }

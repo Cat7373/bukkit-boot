@@ -1,13 +1,13 @@
-package org.cat73.catbase.context;
+package org.cat73.bukkitboot.context;
 
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import org.bukkit.plugin.Plugin;
-import org.cat73.catbase.annotation.CatPlugin;
-import org.cat73.catbase.listener.ListenerManager;
-import org.cat73.catbase.schedule.ScheduleManager;
+import org.cat73.bukkitboot.annotation.CatPlugin;
+import org.cat73.bukkitboot.listener.ListenerManager;
+import org.cat73.bukkitboot.schedule.ScheduleManager;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

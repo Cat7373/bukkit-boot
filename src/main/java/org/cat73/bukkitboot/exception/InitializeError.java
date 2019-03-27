@@ -1,4 +1,4 @@
-package org.cat73.catbase.exception;
+package org.cat73.bukkitboot.exception;
 
 import javax.annotation.Nonnull;
 

@@ -1,4 +1,4 @@
-package org.cat73.catbase.annotation;
+package org.cat73.bukkitboot.annotation;
 
 import javax.annotation.Nonnull;
 import java.lang.annotation.*;

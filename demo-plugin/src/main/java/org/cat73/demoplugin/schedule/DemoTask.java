@@ -1,8 +1,8 @@
 package org.cat73.demoplugin.schedule;
 
-import org.cat73.catbase.annotation.Bean;
-import org.cat73.catbase.annotation.Scheduled;
-import org.cat73.catbase.util.Logger;
+import org.cat73.bukkitboot.annotation.Bean;
+import org.cat73.bukkitboot.annotation.Scheduled;
+import org.cat73.bukkitboot.util.Logger;
 
 @Bean
 public class DemoTask {

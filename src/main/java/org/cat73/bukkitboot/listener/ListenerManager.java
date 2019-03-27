@@ -1,10 +1,10 @@
-package org.cat73.catbase.listener;
+package org.cat73.bukkitboot.listener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
-import org.cat73.catbase.context.IManager;
-import org.cat73.catbase.context.PluginContext;
+import org.cat73.bukkitboot.context.IManager;
+import org.cat73.bukkitboot.context.PluginContext;
 
 import javax.annotation.Nonnull;
 

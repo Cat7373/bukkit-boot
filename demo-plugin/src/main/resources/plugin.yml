@@ -1,5 +1,5 @@
-name: Cat-Base-Demo
+name: Bukkit-Boot-Demo
 version: @version@
-main: org.cat73.demoplugin.CatBaseDemo
+main: org.cat73.demoplugin.BukkitBootDemo
 authors: [Cat73]
-website: https://github.com/Cat7373/Cat-Base
+website: https://github.com/Cat7373/Bukkit-Boot

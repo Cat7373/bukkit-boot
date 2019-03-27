@@ -1,7 +1,7 @@
-package org.cat73.catbase.util.reflect;
+package org.cat73.bukkitboot.util.reflect;
 
 import org.bukkit.Bukkit;
-import org.cat73.catbase.util.Lang;
+import org.cat73.bukkitboot.util.Lang;
 
 import javax.annotation.Nonnull;
 import java.lang.annotation.Annotation;

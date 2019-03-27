@@ -1,7 +1,7 @@
-package org.cat73.catbase.util;
+package org.cat73.bukkitboot.util;
 
 import org.bukkit.plugin.Plugin;
-import org.cat73.catbase.context.PluginContextManager;
+import org.cat73.bukkitboot.context.PluginContextManager;
 
 import javax.annotation.Nonnull;
 

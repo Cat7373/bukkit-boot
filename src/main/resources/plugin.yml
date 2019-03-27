@@ -1,5 +1,5 @@
-name: Cat-Base
+name: Bukkit-Boot
 version: @version@
-main: org.cat73.catbase.CatBase
+main: org.cat73.bukkitboot.BukkitBoot
 authors: [Cat73]
-website: https://github.com/Cat7373/Cat-Base
+website: https://github.com/Cat7373/Bukkit-Boot

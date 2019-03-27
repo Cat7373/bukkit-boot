@@ -1,4 +1,4 @@
-package org.cat73.catbase.context;
+package org.cat73.bukkitboot.context;
 
 import javax.annotation.Nonnull;
 

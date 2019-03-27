@@ -1,4 +1,4 @@
-package org.cat73.catbase.util.reflect;
+package org.cat73.bukkitboot.util.reflect;
 
 import javax.annotation.Nonnull;
 
