@@ -39,10 +39,12 @@ tasks {
 // 依赖版本
 val bukkitVersion =             "1.13.2-R0.1-SNAPSHOT"
 val lombokVersion =             "1.18.6"
+val jsr305Version =             "3.0.2"
 
 // 依赖
 dependencies {
-    implementation         ("org.spigotmc:spigot:$bukkitVersion")
+    compileOnly            ("org.bukkit:bukkit:$bukkitVersion")
+    compileOnly            ("com.google.code.findbugs:jsr305:$jsr305Version")
     annotationProcessor    ("org.projectlombok:lombok:$lombokVersion")
     compileOnly            ("org.projectlombok:lombok:$lombokVersion")
 }
