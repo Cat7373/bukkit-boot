@@ -1,10 +1,10 @@
 package org.cat73.demoplugin;
 
 import org.bukkit.plugin.java.JavaPlugin;
-import org.cat73.bukkitboot.annotation.CatPlugin;
+import org.cat73.bukkitboot.annotation.BukkitBootPlugin;
 
 /**
  * 插件主类
  */
-@CatPlugin
+@BukkitBootPlugin
 public final class BukkitBootDemo extends JavaPlugin {}

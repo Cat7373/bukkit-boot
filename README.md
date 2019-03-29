@@ -14,4 +14,5 @@
 > 仅按字母序进行排序，无先后顺序
 
 * [Nutz](https://github.com/nutzam/nutz)
+* [NyaaCore](https://github.com/NyaaCat/NyaaCore)
 * [Spring Boot](https://github.com/spring-projects/spring-boot)

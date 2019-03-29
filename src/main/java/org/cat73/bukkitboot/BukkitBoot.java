@@ -22,6 +22,7 @@ public final class BukkitBoot extends JavaPlugin {
      * 获取自身的实例
      * @return 自身的实例
      */
+    @Nonnull
     public static BukkitBoot instance() {
         return instance;
     }
@@ -43,15 +44,16 @@ public final class BukkitBoot extends JavaPlugin {
     }
 
     // TODO javadoc
+    // TODO plugin?
     @Nonnull
-    public static Error startupFail(@Nonnull String msg, @Nullable Throwable e, @Nullable Object... args) throws InitializeError {
+    public static Error startupFail(@Nonnull String msg, @Nullable Throwable ex, @Nullable Object... args) throws InitializeError {
         // 停掉服务器
         Bukkit.getServer().shutdown();
         // 返回启动失败的异常
-        if (e == null) {
+        if (ex == null) {
             throw new InitializeError(String.format(msg, args));
         } else {
-            throw new InitializeError(String.format(msg, args), e);
+            throw new InitializeError(String.format(msg, args), ex);
         }
     }
 

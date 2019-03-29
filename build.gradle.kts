@@ -4,47 +4,56 @@ plugins {
     `java-library`
 }
 
-group = "org.cat73"
-version = "1.0.0-dev"
-
-// Java 版本
-configure<JavaPluginConvention> {
-    val javaVersion = JavaVersion.VERSION_1_8
-
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-}
-
-// 仓库配置
-repositories {
-    mavenLocal()
-    jcenter()
-    maven("https://hub.spigotmc.org/nexus/content/repositories/public")
-}
-
-tasks {
-    // 源文件编码
-    withType<JavaCompile> {
-        options.encoding = "UTF-8"
-    }
-
-    // 替换版本号
-    withType<ProcessResources> {
-        from(sourceSets["main"].resources.srcDirs) {
-            filter<ReplaceTokens>(("tokens" to mapOf("version" to version)))
-        }
-    }
-}
-
-// 依赖版本
+// ext
 val bukkitVersion =             "1.13.2-R0.1-SNAPSHOT"
 val lombokVersion =             "1.18.6"
 val jsr305Version =             "3.0.2"
+val dependencyNames = mapOf(
+        "bukkit"        to "org.bukkit:bukkit:$bukkitVersion",
+        "spigot"        to "org.spigotmc:spigot:$bukkitVersion",
+        "lombok"        to "org.projectlombok:lombok:$lombokVersion",
+        "jsr305"        to "com.google.code.findbugs:jsr305:$jsr305Version"
+)
+extra["dependencyNames"] = dependencyNames
+
+allprojects {
+    apply(plugin = "org.gradle.java-library")
+
+    group = "org.cat73"
+    version = "1.0.0-dev"
+
+    // Java 版本
+    configure<JavaPluginConvention> {
+        val javaVersion = JavaVersion.VERSION_1_8
+
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
+    }
+
+    // 仓库配置
+    repositories {
+        mavenLocal()
+        jcenter()
+        maven("https://hub.spigotmc.org/nexus/content/repositories/public")
+    }
+
+    // 源文件编码
+    tasks.withType<JavaCompile> {
+        options.encoding = "UTF-8"
+    }
+}
+
+// 替换版本号
+tasks.withType<ProcessResources> {
+    from(sourceSets["main"].resources.srcDirs) {
+        filter<ReplaceTokens>(("tokens" to mapOf("version" to version)))
+    }
+}
 
 // 依赖
 dependencies {
-    compileOnly            ("org.bukkit:bukkit:$bukkitVersion")
-    compileOnly            ("com.google.code.findbugs:jsr305:$jsr305Version")
-    annotationProcessor    ("org.projectlombok:lombok:$lombokVersion")
-    compileOnly            ("org.projectlombok:lombok:$lombokVersion")
+    compileOnly            ("${dependencyNames["bukkit"]}")
+    compileOnly            ("${dependencyNames["jsr305"]}")
+    annotationProcessor            ("${dependencyNames["lombok"]}")
+    compileOnly            ("${dependencyNames["lombok"]}")
 }

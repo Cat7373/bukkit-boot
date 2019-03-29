@@ -3,6 +3,7 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 *.local
 *.local.*
+runtime/
 
 ### STS ###
 .apt_generated

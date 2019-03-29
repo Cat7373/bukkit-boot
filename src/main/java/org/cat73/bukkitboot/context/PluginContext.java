@@ -3,9 +3,11 @@ package org.cat73.bukkitboot.context;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.bukkit.plugin.Plugin;
-import org.cat73.bukkitboot.annotation.CatPlugin;
+import org.cat73.bukkitboot.annotation.BukkitBootPlugin;
+import org.cat73.bukkitboot.command.CommandManager;
 import org.cat73.bukkitboot.listener.ListenerManager;
 import org.cat73.bukkitboot.schedule.ScheduleManager;
 
@@ -30,7 +32,7 @@ public final class PluginContext {
     /**
      * 插件主类上的插件注解
      */
-    private final CatPlugin pluginAnnotation;
+    private final BukkitBootPlugin pluginAnnotation;
     /**
      * ProtectionDomain 的实例，用于标识同一个包里的类
      */
@@ -39,13 +41,15 @@ public final class PluginContext {
     private final ListenerManager listenerManager = new ListenerManager();
     // TODO javadoc
     private final ScheduleManager scheduleManager = new ScheduleManager();
+    // TODO javadoc
+    private final CommandManager commandManager = new CommandManager();
+
     /**
      * Bean 类名 -> Bean 实例
      */
     // TODO Bean 可能需要个名字
+    @Setter(AccessLevel.PACKAGE)
     private Map<Class<?>, Object> beans;
-
-    // TODO commandManager
 
     // TODO javadoc
     @Nullable
@@ -70,7 +74,7 @@ public final class PluginContext {
      */
     @Nonnull
     static PluginContext valueOf(@Nonnull Plugin plugin) {
-        CatPlugin pluginAnnotation = plugin.getClass().getAnnotation(CatPlugin.class);
+        BukkitBootPlugin pluginAnnotation = plugin.getClass().getAnnotation(BukkitBootPlugin.class);
         ProtectionDomain protectionDomain = plugin.getClass().getProtectionDomain();
 
         return new PluginContext(plugin, pluginAnnotation, protectionDomain);

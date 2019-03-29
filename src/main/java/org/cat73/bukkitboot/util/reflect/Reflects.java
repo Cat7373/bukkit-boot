@@ -39,7 +39,7 @@ public final class Reflects {
     }
 
     // TODO javadoc
-    public static <T extends Annotation> void forEachDeclaredFieldByAnnotation(@Nonnull Class<?> clazz, @Nonnull Class<T> annotationClazz, Lang.ThrowableBiConsumer<Field, T> action) {
+    public static <T extends Annotation> void forEachDeclaredFieldByAnnotation(@Nonnull Class<?> clazz, @Nonnull Class<T> annotationClazz, @Nonnull Lang.ThrowableBiConsumer<Field, T> action) {
         for (Field field : clazz.getDeclaredFields()) {
             T annotation = field.getAnnotation(annotationClazz);
             if (annotation != null) {
@@ -50,13 +50,19 @@ public final class Reflects {
     }
 
     // TODO javadoc
-    public static <T extends Annotation> void forEachMethodByAnnotation(@Nonnull Class<?> clazz, @Nonnull Class<T> annotationClazz, Lang.ThrowableBiConsumer<Method, T> action) {
+    public static <T extends Annotation> void forEachMethodByAnnotation(@Nonnull Class<?> clazz, @Nonnull Class<T> annotationClazz, @Nonnull Lang.ThrowableBiConsumer<Method, T> action) {
         for (Method method : clazz.getMethods()) {
             T annotation = method.getAnnotation(annotationClazz);
             if (annotation != null) {
                 trySetAccessible(method);
                 action.wrap().accept(method, annotation);
             }
+        }
+    }
+
+    public static void forEachMethods(@Nonnull Class<?> clazz, @Nonnull Lang.ThrowableConsumer<Method> action) {
+        for (Method method : clazz.getMethods()) {
+            action.wrap().accept(method);
         }
     }
 

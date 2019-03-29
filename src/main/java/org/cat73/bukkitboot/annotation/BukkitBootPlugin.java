@@ -4,12 +4,12 @@ import javax.annotation.Nonnull;
 import java.lang.annotation.*;
 
 /**
- * 被修饰的插件视为使用 CatPlugin 的插件
+ * 被修饰的插件视为使用 BukkitBoot 的插件
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = ElementType.TYPE)
 @Documented
-public @interface CatPlugin {
+public @interface BukkitBootPlugin {
     /**
      * 需要注册为 Bean 的类列表
      * <p>作为 Bean 的 Class 必须拥有无参的构造方法</p>

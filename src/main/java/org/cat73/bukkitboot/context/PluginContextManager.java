@@ -3,7 +3,7 @@ package org.cat73.bukkitboot.context;
 import org.bukkit.plugin.Plugin;
 import org.cat73.bukkitboot.BukkitBoot;
 import org.cat73.bukkitboot.annotation.Bean;
-import org.cat73.bukkitboot.annotation.CatPlugin;
+import org.cat73.bukkitboot.annotation.BukkitBootPlugin;
 import org.cat73.bukkitboot.annotation.Inject;
 import org.cat73.bukkitboot.annotation.PostConstruct;
 import org.cat73.bukkitboot.util.Lang;
@@ -54,7 +54,7 @@ public final class PluginContextManager {
         if (plugin2context.containsKey(plugin)) {
             return;
         }
-        if (!plugin.getClass().isAnnotationPresent(CatPlugin.class)) {
+        if (!plugin.getClass().isAnnotationPresent(BukkitBootPlugin.class)) {
             return;
         }
 
@@ -118,11 +118,12 @@ public final class PluginContextManager {
         });
     }
 
-    private static void createBean(Class<?> clazz, Map<Class<?>, Object> beans) {
+    // TODO javadoc
+    private static void createBean(@Nonnull Class<?> clazz, @Nonnull Map<Class<?>, Object> beans) {
         // TODO 或许应该要求 Class 上带注解？然后就可以给起名字了
         //   以及可能可以给默认名称
         // 重复的 Class 跳过
-        if (clazz == null || beans.containsKey(clazz)) {
+        if (beans.containsKey(clazz)) {
             return;
         }
         // 创建并保存 Bean
@@ -168,7 +169,7 @@ public final class PluginContextManager {
      * <ul>
      *     <!-- TODO <li>Command</li> -->
      *     <li>Listener</li>
-     *     <!-- TODO <li>Task</li> -->
+     *     <li>Schedule</li>
      * </ul>
      */
     private static void autoRegister() {
