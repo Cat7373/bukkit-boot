@@ -25,7 +25,7 @@ public final class PluginContextManager {
     /**
      * 搜索调用树时忽略的包(框架自身)
      */
-    private static final String IGNORE_PACKAGE = "org.cat73.bukkitboot";
+    private static final ProtectionDomain sekfProtectionDomain = PluginContextManager.class.getProtectionDomain();
     /**
      * 插件到上下文的缓存
      */
@@ -45,6 +45,7 @@ public final class PluginContextManager {
 
     /**
      * 注册一个插件，会自动忽略无本框架注解的插件
+     * <p>只有初始化阶段之前允许注册插件</p>
      * @param plugin 插件的主类
      */
     public static void register(@Nonnull Plugin plugin) {
@@ -150,9 +151,7 @@ public final class PluginContextManager {
                 }
 
                 // 设置权限
-                if (!field.isAccessible()) {
-                    field.setAccessible(true);
-                }
+                Reflects.trySetAccessible(field);
                 // 注入内容
                 try {
                     field.set(bean, injectBean);
@@ -167,7 +166,7 @@ public final class PluginContextManager {
      * 初始化 - 步骤3 - 自动注册
      * <p>目前支持注册：</p>
      * <ul>
-     *     <!-- TODO <li>Command</li> -->
+     *     <li>Command</li>
      *     <li>Listener</li>
      *     <li>Schedule</li>
      * </ul>
@@ -177,6 +176,7 @@ public final class PluginContextManager {
         forEachBeans((context, bean) -> {
             context.getListenerManager().register(context, bean);
             context.getScheduleManager().register(context, bean);
+            context.getCommandManager().register(context, bean);
         });
     }
 
@@ -217,7 +217,7 @@ public final class PluginContextManager {
     /**
      * 从调用树中分析查找出调用插件的上下文
      * @return 调用插件的上下文
-     * @throws NullPointerException 如果本框架有 bug 或非插件的第三方包直接调用了本方法
+     * @throws NullPointerException 如果非插件的第三方包直接调用了本方法
      */
     @Nonnull
     public static PluginContext current() throws NullPointerException {
@@ -228,13 +228,10 @@ public final class PluginContextManager {
         // 遍历调用树，查找插件
         for (int i = 1; i <= lastIdx; i++) {
             StackTraceElement stackTrace = stackTraces[i];
-            // 如果不在忽略的包下面(本框架的包)，则尝试获取插件的上下文
-            if (!stackTrace.getClassName().startsWith(IGNORE_PACKAGE)) {
-                PluginContext context = getContextByClass(stackTrace.getClassName());
-                // 获取到则返回
-                if (context != null) {
-                    return context;
-                }
+            PluginContext context = getContextByClass(stackTrace.getClassName());
+            // 获取到则返回
+            if (context != null) {
+                return context;
             }
         }
 
@@ -254,11 +251,16 @@ public final class PluginContextManager {
         // 查找缓存
         PluginContext context = className2Context.get(className);
 
-        // 若缓存中未找到，则尝试获取
+        // 若缓存未命中，则尝试获取
         if (context == null && !className2Context.containsKey(className)) {
             try {
                 ProtectionDomain protectionDomain = Class.forName(className).getProtectionDomain();
-                context = protectionDomain2Context.get(protectionDomain);
+
+                // 如果不在忽略的包下面(本框架的包)，则尝试获取插件的上下文
+                if (protectionDomain != sekfProtectionDomain) {
+                    context = protectionDomain2Context.get(protectionDomain);
+                }
+
                 // 哪怕没获取到也要 put 进去，这样下次就只需要低成本的一次 get、一次 containsKey 即可，无需再尝试获取
                 className2Context.put(className, context);
             } catch (ClassNotFoundException e) {

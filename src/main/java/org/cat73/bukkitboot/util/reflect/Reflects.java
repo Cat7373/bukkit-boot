@@ -51,15 +51,16 @@ public final class Reflects {
 
     // TODO javadoc
     public static <T extends Annotation> void forEachMethodByAnnotation(@Nonnull Class<?> clazz, @Nonnull Class<T> annotationClazz, @Nonnull Lang.ThrowableBiConsumer<Method, T> action) {
-        for (Method method : clazz.getMethods()) {
-            T annotation = method.getAnnotation(annotationClazz);
+        forEachMethods(clazz, m -> {
+            T annotation = m.getAnnotation(annotationClazz);
             if (annotation != null) {
-                trySetAccessible(method);
-                action.wrap().accept(method, annotation);
+                trySetAccessible(m);
+                action.wrap().accept(m, annotation);
             }
-        }
+        });
     }
 
+    // TODO javadoc
     public static void forEachMethods(@Nonnull Class<?> clazz, @Nonnull Lang.ThrowableConsumer<Method> action) {
         for (Method method : clazz.getMethods()) {
             action.wrap().accept(method);

@@ -1,7 +1,5 @@
 package org.cat73.bukkitboot.util;
 
-import org.cat73.bukkitboot.context.PluginContextManager;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.logging.Level;
@@ -21,7 +19,7 @@ public final class Logger {
      * @param args 格式化时使用的参数
      */
     public static void log(@Nonnull Level level, @Nonnull String format, @Nullable Object... args) {
-        PluginContextManager.current().getPlugin().getLogger().log(level, String.format(format, args));
+        Plugins.current().getLogger().log(level, String.format(format, args));
     }
 
     /**

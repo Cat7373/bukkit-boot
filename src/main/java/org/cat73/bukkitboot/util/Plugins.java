@@ -15,7 +15,8 @@ public final class Plugins {
      * @return 当前插件的实例
      */
     @Nonnull
-    public Plugin current() {
-        return PluginContextManager.current().getPlugin();
+    @SuppressWarnings("unchecked")
+    public static <T extends Plugin> T current() {
+        return (T) PluginContextManager.current().getPlugin();
     }
 }
