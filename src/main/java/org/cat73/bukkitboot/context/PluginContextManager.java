@@ -6,6 +6,7 @@ import org.cat73.bukkitboot.annotation.Bean;
 import org.cat73.bukkitboot.annotation.BukkitBootPlugin;
 import org.cat73.bukkitboot.annotation.Inject;
 import org.cat73.bukkitboot.annotation.PostConstruct;
+import org.cat73.bukkitboot.context.bean.BeanInfo;
 import org.cat73.bukkitboot.util.Lang;
 import org.cat73.bukkitboot.util.reflect.Reflects;
 import org.cat73.bukkitboot.util.reflect.Scans;
@@ -98,41 +99,26 @@ public final class PluginContextManager {
     private static void createBeans() {
         // 遍历插件
         forEachPlugins(context -> {
-            Map<Class<?>, Object> beans = new HashMap<>();
             // 注册插件主类
-            beans.put(context.getPlugin().getClass(), context.getPlugin());
+            context.registerBean(context.getPlugin());
+            // 注册 Context
+            context.registerBean(context);
+
             // 循环创建 Bean
             for (Class<?> clazz : context.getPluginAnnotation().classes()) {
-                createBean(clazz, beans);
+                context.registerBean(Reflects.newInstance(clazz));
             }
-            // 如果启用了自动扫描，则以插件主类为引，进行自动扫描
+            // TODO 如果启用了自动扫描，则以插件主类为引，进行自动扫描
             if (context.getPluginAnnotation().autoScanPackage()) {
                 for (Class<?> clazz : Scans.scanClass(context.getPlugin().getClass())) {
                     // 如果包含 @Bean 注解，则自动创建这个 Bean
-                    if (clazz.isAnnotationPresent(Bean.class)) {
-                        createBean(clazz, beans);
+                    Bean annotation = clazz.getAnnotation(Bean.class);
+                    if (annotation != null) {
+                        context.registerBean(Reflects.newInstance(clazz), annotation.name());
                     }
                 }
             }
-            // 保存 Bean 列表到 Context 中
-            context.setBeans(Collections.unmodifiableMap(beans));
         });
-    }
-
-    // TODO javadoc
-    private static void createBean(@Nonnull Class<?> clazz, @Nonnull Map<Class<?>, Object> beans) {
-        // TODO 或许应该要求 Class 上带注解？然后就可以给起名字了
-        //   以及可能可以给默认名称
-        // 重复的 Class 跳过
-        if (beans.containsKey(clazz)) {
-            return;
-        }
-        // 创建并保存 Bean
-        try {
-            beans.put(clazz, Reflects.newInstance(clazz));
-        } catch (Exception e) {
-            throw BukkitBoot.startupFail("实例化 Bean %s 失败", e, clazz.getName());
-        }
     }
 
     /**
@@ -145,8 +131,8 @@ public final class PluginContextManager {
             Reflects.forEachDeclaredFieldByAnnotation(bean.getClass(), Inject.class, (field, annotation) -> {
                 // 根据类型搜索注入的属性
                 Class<?> type = field.getType();
-                Object injectBean = context.resolveBean(type);
-                if (injectBean == null) {
+                Object injectBean = context.resolveBean(type, annotation.name());
+                if (injectBean == null && annotation.required()) {
                     throw BukkitBoot.startupFail("无法解决 Bean %s 的依赖 %s，其类型为 %s", null, bean.getClass().getName(), field.getName(), type.getName());
                 }
 
@@ -190,6 +176,7 @@ public final class PluginContextManager {
             Reflects.forEachMethodByAnnotation(bean.getClass(), PostConstruct.class, (method, annotation) -> {
                 // 调用初始化方法
                 try {
+                    // TODO 支持参数注入
                     method.invoke(bean);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     throw Lang.wrapThrow(e);
@@ -208,8 +195,8 @@ public final class PluginContextManager {
     // TODO javadoc
     private static void forEachBeans(@Nonnull Lang.ThrowableBiConsumer<PluginContext, Object> action) {
         for (PluginContext context : plugin2context.values()) {
-            for (Object bean : context.getBeans().values()) {
-                action.wrap().accept(context, bean);
+            for (BeanInfo beanInfo : context.getBeans()) {
+                action.wrap().accept(context, beanInfo.getBean());
             }
         }
     }

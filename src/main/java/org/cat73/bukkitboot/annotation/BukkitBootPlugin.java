@@ -20,6 +20,7 @@ public @interface BukkitBootPlugin {
 
     /**
      * 是否自动扫描包中的类，如果为 true，则自动扫描包中的类，并将被 @Bean 注解修饰的类自动注册为 Bean
+     * <p>作为 Bean 的 Class 必须拥有无参的构造方法</p>
      * @return 是否自动扫描包中的类
      */
     boolean autoScanPackage() default true;

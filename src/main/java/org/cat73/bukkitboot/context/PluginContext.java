@@ -6,14 +6,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.bukkit.plugin.Plugin;
+import org.cat73.bukkitboot.BukkitBoot;
 import org.cat73.bukkitboot.annotation.BukkitBootPlugin;
 import org.cat73.bukkitboot.command.CommandManager;
+import org.cat73.bukkitboot.context.bean.BeanInfo;
 import org.cat73.bukkitboot.listener.ListenerManager;
 import org.cat73.bukkitboot.schedule.ScheduleManager;
+import org.cat73.bukkitboot.util.Strings;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.security.ProtectionDomain;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -44,19 +49,53 @@ public final class PluginContext {
     // TODO javadoc
     private final CommandManager commandManager = new CommandManager();
 
-    /**
-     * Bean 类名 -> Bean 实例
-     */
-    // TODO Bean 可能需要个名字
-    @Setter(AccessLevel.PACKAGE)
-    private Map<Class<?>, Object> beans;
+    // TODO javadoc
+    @Setter(AccessLevel.PRIVATE)
+    private List<BeanInfo> beans = new ArrayList<>();
+    // TODO javadoc
+    @Setter(AccessLevel.PRIVATE)
+    private Map<String, BeanInfo> name2Bean = new HashMap<>();
+    // TODO javadoc
+    @Setter(AccessLevel.PRIVATE)
+    private Map<Class<?>, List<BeanInfo>> type2Bean = new HashMap<>();
+
+    // TODO javadoc
+    void registerBean(@Nonnull Object bean, @Nullable String name) {
+        // bean name
+        String beanName = name;
+        if (Strings.isEmpty(beanName)) {
+            beanName = bean.getClass().getSimpleName();
+            beanName = Character.toLowerCase(beanName.charAt(0)) + beanName.substring(1);
+        }
+        // class
+        Class<?> clazz = bean.getClass();
+
+        // 校验重复
+        if (name2Bean.containsKey(beanName)) {
+            throw BukkitBoot.startupFail("bean name 冲突: %s", null, beanName);
+        }
+
+        // 创建 BeanInfo 并保存
+        BeanInfo beanInfo = new BeanInfo(beanName, bean.getClass(), bean);
+        this.beans.add(beanInfo);
+        this.name2Bean.put(beanName, beanInfo);
+        this.type2Bean.computeIfAbsent(clazz, c -> new ArrayList<>()).add(beanInfo);
+    }
+
+    // TODO javadoc
+    void registerBean(@Nonnull Object bean) {
+        this.registerBean(bean, null);
+    }
 
     // TODO javadoc
     @Nullable
-    public Object resolveBean(@Nonnull Class<?> clazz) {
-        List<Object> resultList = this.beans.entrySet().stream()
-                .filter(e -> clazz.isAssignableFrom(e.getKey()))
-                .map(Map.Entry::getValue)
+    public Object resolveBean(@Nonnull Class<?> clazz, @Nullable String name) {
+        // TODO cache？name2Bean？type2Bean？
+
+        List<Object> resultList = this.beans.stream()
+                .filter(i -> clazz.isAssignableFrom(i.getType()))
+                .filter(i -> Strings.isEmpty(name) || name.equals(i.getName()))
+                .map(BeanInfo::getBean)
                 .collect(Collectors.toList());
 
         if (resultList.size() != 1) {

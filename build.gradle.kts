@@ -8,11 +8,14 @@ plugins {
 val bukkitVersion =             "1.13.2-R0.1-SNAPSHOT"
 val lombokVersion =             "1.18.6"
 val jsr305Version =             "3.0.2"
+val junitVersion =              "5.4.1"
 val dependencyNames = mapOf(
-        "bukkit"        to "org.bukkit:bukkit:$bukkitVersion",
-        "spigot"        to "org.spigotmc:spigot:$bukkitVersion",
-        "lombok"        to "org.projectlombok:lombok:$lombokVersion",
-        "jsr305"        to "com.google.code.findbugs:jsr305:$jsr305Version"
+        "bukkit"               to "org.bukkit:bukkit:$bukkitVersion",
+        "spigot"               to "org.spigotmc:spigot:$bukkitVersion",
+        "lombok"               to "org.projectlombok:lombok:$lombokVersion",
+        "jsr305"               to "com.google.code.findbugs:jsr305:$jsr305Version",
+        "junit-jupiter-api"    to "org.junit.jupiter:junit-jupiter-api:$junitVersion",
+        "junit-jupiter-engine" to "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
 )
 extra["dependencyNames"] = dependencyNames
 
@@ -50,10 +53,20 @@ tasks.withType<ProcessResources> {
     }
 }
 
+// 使用 JUnit 的单元测试平台
+tasks.withType<Test> {
+    useJUnitPlatform()
+}
+
 // 依赖
 dependencies {
     compileOnly            ("${dependencyNames["bukkit"]}")
     compileOnly            ("${dependencyNames["jsr305"]}")
-    annotationProcessor            ("${dependencyNames["lombok"]}")
+    annotationProcessor    ("${dependencyNames["lombok"]}")
     compileOnly            ("${dependencyNames["lombok"]}")
+
+    testAnnotationProcessor ("${dependencyNames["lombok"]}")
+    testCompileOnly         ("${dependencyNames["lombok"]}")
+    testImplementation      ("${dependencyNames["junit-jupiter-api"]}")
+    testRuntimeOnly         ("${dependencyNames["junit-jupiter-engine"]}")
 }

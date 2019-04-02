@@ -18,5 +18,11 @@ public @interface Inject {
      * 是否是必须的，如果非必须，则未找到值时不会阻止服务器启动
      * @return 是否是必须的
      */
-    boolean required() default true; // TODO 实现
+    boolean required() default true;
+
+    /**
+     * Bean 的名称
+     * @return Bean 的名称
+     */
+    String name() default "";
 }
