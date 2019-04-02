@@ -11,7 +11,7 @@ public class Bean1 {
     private Bean2 bean;
 
     @PostConstruct
-    public void init() {
-        Logger.debug("Bean1.init(): bean: %s", bean);
+    public void init(Bean3 parameterBean) {
+        Logger.debug("Bean1.init(): bean: %s, parameterBean: %s", this.bean.getClass().getSimpleName(), parameterBean.getClass().getSimpleName());
     }
 }

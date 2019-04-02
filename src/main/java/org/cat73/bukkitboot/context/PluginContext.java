@@ -90,11 +90,12 @@ public final class PluginContext {
     // TODO javadoc
     @Nullable
     public Object resolveBean(@Nonnull Class<?> clazz, @Nullable String name) {
-        // TODO cache？name2Bean？type2Bean？
+        if (Strings.notEmpty(name)) {
+            return name2Bean.get(name);
+        }
 
         List<Object> resultList = this.beans.stream()
                 .filter(i -> clazz.isAssignableFrom(i.getType()))
-                .filter(i -> Strings.isEmpty(name) || name.equals(i.getName()))
                 .map(BeanInfo::getBean)
                 .collect(Collectors.toList());
 

@@ -8,6 +8,7 @@ import org.cat73.bukkitboot.annotation.Inject;
 import org.cat73.bukkitboot.annotation.PostConstruct;
 import org.cat73.bukkitboot.context.bean.BeanInfo;
 import org.cat73.bukkitboot.util.Lang;
+import org.cat73.bukkitboot.util.reflect.ParameterInject;
 import org.cat73.bukkitboot.util.reflect.Reflects;
 import org.cat73.bukkitboot.util.reflect.Scans;
 
@@ -176,8 +177,8 @@ public final class PluginContextManager {
             Reflects.forEachMethodByAnnotation(bean.getClass(), PostConstruct.class, (method, annotation) -> {
                 // 调用初始化方法
                 try {
-                    // TODO 支持参数注入
-                    method.invoke(bean);
+                    Object[] params = ParameterInject.resolve(context, null, null, method.getParameters());
+                    method.invoke(bean, params);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     throw Lang.wrapThrow(e);
                 }

@@ -1,6 +1,5 @@
 package org.cat73.bukkitboot.util.reflect;
 
-import org.bukkit.Bukkit;
 import org.cat73.bukkitboot.util.Lang;
 
 import javax.annotation.Nonnull;
@@ -17,15 +16,6 @@ public final class Reflects {
     private Reflects() {
         throw new UnsupportedOperationException();
     }
-
-    /**
-     * 当前正运行的服务器的 NMS 版本的名字
-     **/
-    public static final String CURRENT_NMS_VERSION_NAME = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-    /**
-     * 当前正运行的服务器的 NMS 版本
-     **/
-    public static final NMSVersion CURRENT_NMS_VERSION = NMSVersion.valueOf(CURRENT_NMS_VERSION_NAME);
 
     // TODO javadoc
     @SuppressWarnings("unchecked")

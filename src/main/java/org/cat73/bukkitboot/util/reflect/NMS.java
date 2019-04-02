@@ -1,11 +1,13 @@
 package org.cat73.bukkitboot.util.reflect;
 
+import org.bukkit.Bukkit;
+
 import javax.annotation.Nonnull;
 
 /**
- * NMS 的版本
+ * NMS 版本枚举
  */
-public enum NMSVersion {
+public enum NMS {
     /**
      * 1.8
      */
@@ -62,10 +64,19 @@ public enum NMSVersion {
      */
     UNKNOWN;
 
+    /**
+     * 当前正运行的服务器的 NMS 版本的名字
+     **/
+    public static final String CURRENT_NMS_VERSION_NAME = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+    /**
+     * 当前正运行的服务器的 NMS 版本
+     **/
+    public static final NMS CURRENT_NMS_VERSION = NMS.valueOf(CURRENT_NMS_VERSION_NAME);
+
     // TODO javadoc
     @Nonnull
-    public static NMSVersion forName(@Nonnull String name) {
-        for (NMSVersion version : NMSVersion.values()) {
+    public static NMS forName(@Nonnull String name) {
+        for (NMS version : NMS.values()) {
             if (version.name().equals(name)) {
                 return version;
             }
@@ -73,4 +84,7 @@ public enum NMSVersion {
 
         return UNKNOWN;
     }
+
+    // TODO nmsClass
+    // TODO cbClass
 }
