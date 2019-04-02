@@ -73,7 +73,11 @@ public enum NMS {
      **/
     public static final NMS CURRENT_NMS_VERSION = NMS.valueOf(CURRENT_NMS_VERSION_NAME);
 
-    // TODO javadoc
+    /**
+     * 基于版本的名字获取枚举实例
+     * @param name 版本的名字
+     * @return 版本的枚举实例，如未获取到，则会返回 UNKNOWN
+     */
     @Nonnull
     public static NMS forName(@Nonnull String name) {
         for (NMS version : NMS.values()) {

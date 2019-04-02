@@ -43,7 +43,14 @@ public final class BukkitBoot extends JavaPlugin {
         PluginContextManager.initialize();
     }
 
-    // TODO javadoc
+    /**
+     * 启动失败，终止服务器并抛出初始化错误
+     * @param msg 错误信息的格式
+     * @param ex 异常对象
+     * @param args 用于格式化的参数
+     * @return 永远不会返回任何内容，但调用方可将返回值 throw 来中断控制流
+     * @throws InitializeError 一定会抛出的初始化错误
+     */
     // TODO plugin?
     @Nonnull
     public static Error startupFail(@Nonnull String msg, @Nullable Throwable ex, @Nullable Object... args) throws InitializeError {

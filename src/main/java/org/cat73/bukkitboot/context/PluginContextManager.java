@@ -183,17 +183,26 @@ public final class PluginContextManager {
                     throw Lang.wrapThrow(e);
                 }
             });
+
+            // 命令的初始化
+            context.getCommandManager().initial(context.getPlugin());
         });
     }
 
-    // TODO javadoc
+    /**
+     * 遍历插件
+     * @param action 对于每个插件需要做的操作
+     */
     private static void forEachPlugins(@Nonnull Lang.ThrowableConsumer<PluginContext> action) {
         for (PluginContext context : plugin2context.values()) {
             action.wrap().accept(context);
         }
     }
 
-    // TODO javadoc
+    /**
+     * 遍历 Bean
+     * @param action 对于每个 Bean 要做的操作
+     */
     private static void forEachBeans(@Nonnull Lang.ThrowableBiConsumer<PluginContext, Object> action) {
         for (PluginContext context : plugin2context.values()) {
             for (BeanInfo beanInfo : context.getBeans()) {

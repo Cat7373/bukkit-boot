@@ -11,9 +11,13 @@ import org.cat73.bukkitboot.util.reflect.Reflects;
 
 import javax.annotation.Nonnull;
 
-// TODO javadoc
+/**
+ * 定时任务管理器
+ */
 public class ScheduleManager implements IManager {
-    // TODO javadoc
+    /**
+     * Bukkit 的定时任务
+     */
     private final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
     @Override

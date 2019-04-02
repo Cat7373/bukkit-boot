@@ -5,6 +5,9 @@ import org.cat73.bukkitboot.context.PluginContextManager;
 
 import javax.annotation.Nonnull;
 
+/**
+ * 插件操作的工具类
+ */
 public final class Plugins {
     private Plugins() {
         throw new UnsupportedOperationException();

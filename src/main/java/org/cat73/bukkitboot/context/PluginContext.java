@@ -42,24 +42,35 @@ public final class PluginContext {
      * ProtectionDomain 的实例，用于标识同一个包里的类
      */
     private final ProtectionDomain protectionDomain;
-    // TODO javadoc
+    /**
+     * Listener 管理器
+     */
     private final ListenerManager listenerManager = new ListenerManager();
-    // TODO javadoc
+    /**
+     * 定时任务管理器
+     */
     private final ScheduleManager scheduleManager = new ScheduleManager();
-    // TODO javadoc
+    /**
+     * 命令管理器
+     */
     private final CommandManager commandManager = new CommandManager();
 
-    // TODO javadoc
+    /**
+     * Bean 列表
+     */
     @Setter(AccessLevel.PRIVATE)
     private List<BeanInfo> beans = new ArrayList<>();
-    // TODO javadoc
+    /**
+     * 基于 name 的 Bean 速查表
+     */
     @Setter(AccessLevel.PRIVATE)
     private Map<String, BeanInfo> name2Bean = new HashMap<>();
-    // TODO javadoc
-    @Setter(AccessLevel.PRIVATE)
-    private Map<Class<?>, List<BeanInfo>> type2Bean = new HashMap<>();
 
-    // TODO javadoc
+    /**
+     * 注册一个 Bean
+     * @param bean 被注册的 Bean
+     * @param name Bean 的名字，如果为 null 或为空字符串，则会将其 Class 的名字转驼峰式后作为名字使用
+     */
     void registerBean(@Nonnull Object bean, @Nullable String name) {
         // bean name
         String beanName = name;
@@ -79,15 +90,22 @@ public final class PluginContext {
         BeanInfo beanInfo = new BeanInfo(beanName, bean.getClass(), bean);
         this.beans.add(beanInfo);
         this.name2Bean.put(beanName, beanInfo);
-        this.type2Bean.computeIfAbsent(clazz, c -> new ArrayList<>()).add(beanInfo);
     }
 
-    // TODO javadoc
+    /**
+     * 注册一个 Bean，会将其 Class 的名字转驼峰式后作为名字使用
+     * @param bean 被注册的 Bean
+     */
     void registerBean(@Nonnull Object bean) {
         this.registerBean(bean, null);
     }
 
-    // TODO javadoc
+    /**
+     * 尝试解决一个 Bean 依赖
+     * @param clazz 需求的 Class
+     * @param name 需求的名字(可空)
+     * @return 找到的 Bean 实例，如未找到，则会返回 null
+     */
     @Nullable
     public Object resolveBean(@Nonnull Class<?> clazz, @Nullable String name) {
         if (Strings.notEmpty(name)) {

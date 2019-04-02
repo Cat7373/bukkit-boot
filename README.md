@@ -15,3 +15,4 @@
 * [Nutz](https://github.com/nutzam/nutz)
 * [NyaaCore](https://github.com/NyaaCat/NyaaCore)
 * [Spring Boot](https://github.com/spring-projects/spring-boot)
+* [WorldEdit](https://github.com/EngineHub/WorldEdit)

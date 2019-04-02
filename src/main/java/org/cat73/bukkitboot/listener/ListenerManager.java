@@ -8,10 +8,14 @@ import org.cat73.bukkitboot.context.PluginContext;
 
 import javax.annotation.Nonnull;
 
-// TODO javadoc
+/**
+ * Listener 管理器
+ */
 public class ListenerManager implements IManager {
-    // TODO javadoc
-    private final PluginManager pluginManager = Bukkit.getServer().getPluginManager();
+    /**
+     * Bukkit 的插件管理器
+     */
+    private static final PluginManager pluginManager = Bukkit.getServer().getPluginManager();
 
     @Override
     public void register(@Nonnull PluginContext context, @Nonnull Object bean) {
