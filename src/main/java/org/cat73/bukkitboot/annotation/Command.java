@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * 一个可以被执行的命令
+ * <!-- TODO <p>所需参数会自动注入</p> -->
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = ElementType.METHOD)

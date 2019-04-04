@@ -17,10 +17,7 @@ import org.cat73.bukkitboot.util.Strings;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.security.ProtectionDomain;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -109,7 +106,7 @@ public final class PluginContext {
     @Nullable
     public Object resolveBean(@Nonnull Class<?> clazz, @Nullable String name) {
         if (Strings.notEmpty(name)) {
-            return name2Bean.get(name);
+            return Optional.ofNullable(name2Bean.get(name)).map(BeanInfo::getBean).orElse(null);
         }
 
         List<Object> resultList = this.beans.stream()

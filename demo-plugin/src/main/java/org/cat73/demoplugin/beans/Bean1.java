@@ -7,8 +7,8 @@ import org.cat73.bukkitboot.util.Logger;
 
 @Bean
 public class Bean1 {
-    @Inject
-    private Bean2 bean;
+    @Inject(name = "bean2")
+    private Object bean;
 
     @PostConstruct
     public void init(Bean3 parameterBean) {

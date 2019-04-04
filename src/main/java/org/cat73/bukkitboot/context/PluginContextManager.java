@@ -27,7 +27,7 @@ public final class PluginContextManager {
     /**
      * 搜索调用树时忽略的包(框架自身)
      */
-    private static final ProtectionDomain sekfProtectionDomain = PluginContextManager.class.getProtectionDomain();
+    private static final ProtectionDomain selfProtectionDomain = PluginContextManager.class.getProtectionDomain();
     /**
      * 插件到上下文的缓存
      */
@@ -109,7 +109,7 @@ public final class PluginContextManager {
             for (Class<?> clazz : context.getPluginAnnotation().classes()) {
                 context.registerBean(Reflects.newInstance(clazz));
             }
-            // TODO 如果启用了自动扫描，则以插件主类为引，进行自动扫描
+            // 如果启用了自动扫描，则以插件主类为引，进行自动扫描
             if (context.getPluginAnnotation().autoScanPackage()) {
                 for (Class<?> clazz : Scans.scanClass(context.getPlugin().getClass())) {
                     // 如果包含 @Bean 注解，则自动创建这个 Bean
@@ -254,7 +254,7 @@ public final class PluginContextManager {
                 ProtectionDomain protectionDomain = Class.forName(className).getProtectionDomain();
 
                 // 如果不在忽略的包下面(本框架的包)，则尝试获取插件的上下文
-                if (protectionDomain != sekfProtectionDomain) {
+                if (protectionDomain != selfProtectionDomain) {
                     context = protectionDomain2Context.get(protectionDomain);
                 }
 

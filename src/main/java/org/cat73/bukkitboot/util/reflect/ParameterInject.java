@@ -36,13 +36,13 @@ public final class ParameterInject {
         int paramIdx = 0;
         for (int idx = 0; idx < parameters.length; idx++) {
             // 参数
-            Parameter parameter = parameters[idx]; // TODO @Param("foo")
+            Parameter parameter = parameters[idx];
 
             Object result = null;
 
             // 尝试从 context 解析
             if (context != null) {
-                result = context.resolveBean(parameter.getType(), null);
+                result = context.resolveBean(parameter.getType(), null); // TODO 根据名字注入 @Inject("foo")
             }
             // 尝试从 objs 解析
             if (result == null && objs != null) {
