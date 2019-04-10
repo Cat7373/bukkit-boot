@@ -2,12 +2,10 @@ package org.cat73.bukkitboot.context;
 
 import org.bukkit.plugin.Plugin;
 import org.cat73.bukkitboot.BukkitBoot;
-import org.cat73.bukkitboot.annotation.Bean;
-import org.cat73.bukkitboot.annotation.BukkitBootPlugin;
-import org.cat73.bukkitboot.annotation.Inject;
-import org.cat73.bukkitboot.annotation.PostConstruct;
+import org.cat73.bukkitboot.annotation.*;
 import org.cat73.bukkitboot.context.bean.BeanInfo;
 import org.cat73.bukkitboot.util.Lang;
+import org.cat73.bukkitboot.util.reflect.NMS;
 import org.cat73.bukkitboot.util.reflect.ParameterInject;
 import org.cat73.bukkitboot.util.reflect.Reflects;
 import org.cat73.bukkitboot.util.reflect.Scans;
@@ -96,7 +94,6 @@ public final class PluginContextManager {
     /**
      * 初始化 - 步骤1 - 创建所有 Bean
      */
-    // TODO 支持按需初始化，如 @NMSVersion
     private static void createBeans() {
         // 遍历插件
         forEachPlugins(context -> {
@@ -107,7 +104,7 @@ public final class PluginContextManager {
 
             // 循环创建 Bean
             for (Class<?> clazz : context.getPluginAnnotation().classes()) {
-                context.registerBean(Reflects.newInstance(clazz));
+                registerBean(context, clazz);
             }
             // 如果启用了自动扫描，则以插件主类为引，进行自动扫描
             if (context.getPluginAnnotation().autoScanPackage()) {
@@ -115,11 +112,28 @@ public final class PluginContextManager {
                     // 如果包含 @Bean 注解，则自动创建这个 Bean
                     Bean annotation = clazz.getAnnotation(Bean.class);
                     if (annotation != null) {
-                        context.registerBean(Reflects.newInstance(clazz), annotation.name());
+                        registerBean(context, clazz, annotation.name());
                     }
                 }
             }
         });
+    }
+
+    // TODO javadoc
+    private static void registerBean(@Nonnull PluginContext context, @Nonnull Class<?> clazz) {
+        registerBean(context, clazz);
+    }
+
+    // TODO javadoc
+    private static void registerBean(@Nonnull PluginContext context, @Nonnull Class<?> clazz, @Nullable String name) {
+        // 校验 NMSVersion
+        NMSVersion nmsVersion = clazz.getAnnotation(NMSVersion.class);
+        if (nmsVersion != null && nmsVersion.value() != NMS.CURRENT_NMS_VERSION) {
+            return; // 版本不符，放弃注册 Bean
+        }
+
+        // 注册 Bean
+        context.registerBean(Reflects.newInstance(clazz), name);
     }
 
     /**
