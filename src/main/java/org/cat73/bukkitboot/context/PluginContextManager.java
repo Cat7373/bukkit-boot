@@ -14,6 +14,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
 import java.security.ProtectionDomain;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -130,6 +131,13 @@ public final class PluginContextManager {
         NMSVersion nmsVersion = clazz.getAnnotation(NMSVersion.class);
         if (nmsVersion != null && nmsVersion.value() != NMS.CURRENT_NMS_VERSION) {
             return; // 版本不符，放弃注册 Bean
+        }
+
+        // 支持多个 NMSVersion 的 Bean，校验是否符合其一
+        NMSVersions nmsVersions = clazz.getAnnotation(NMSVersions.class);
+        if (nmsVersions != null && Arrays.stream(nmsVersions.value())
+                .noneMatch(v -> v.value() == NMS.CURRENT_NMS_VERSION)) {
+            return; // 没有符合的版本，放弃注册 Bean
         }
 
         // 注册 Bean

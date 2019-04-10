@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 /**
  * 定时任务
  */
+// TODO 允许多个
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Scheduled {

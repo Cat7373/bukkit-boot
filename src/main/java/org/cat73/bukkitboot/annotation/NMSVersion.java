@@ -10,6 +10,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+@Repeatable(NMSVersions.class)
 public @interface NMSVersion {
     /**
      * 需要的 NMS 版本
