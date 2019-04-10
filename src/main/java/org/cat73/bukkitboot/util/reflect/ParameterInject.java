@@ -5,9 +5,10 @@ import org.cat73.bukkitboot.context.PluginContext;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.Parameter;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 参数注入工具类(额外支持按顺序的 String 参数，用于处理命令参数)
@@ -22,12 +23,13 @@ public final class ParameterInject {
     /**
      * 尝试解决一些参数
      * @param context 插件的上下文(可选，如果希望从上下文中解决依赖)
-     * @param objs 自定义的 Class 到实体的解决关系
+     * @param objs 自定义的实体列表
      * @param byIdxParams 基于顺序的参数，如果从上面两个中无法解决依赖，且参数类型为基本数据类型或其包装类，或为 String，则从这里来按顺序解析，每次成功解析则后移一个元素
      * @param parameters 要被解决的参数数组
      * @return 解决后的值实例数组
      */
-    public static Object[] resolve(@Nullable PluginContext context, @Nullable Map<Class<?>, Object> objs, @Nullable List<String> byIdxParams, @Nonnull Parameter[] parameters) {
+    // TODO byIdxParams 可迭代即可
+    public static Object[] resolve(@Nullable PluginContext context, @Nullable Collection<?> objs, @Nullable List<String> byIdxParams, @Nonnull Parameter[] parameters) {
         if (parameters.length == 0) {
             return EMPTY_OBJECT_ARRAY;
         }
@@ -37,22 +39,30 @@ public final class ParameterInject {
         for (int idx = 0; idx < parameters.length; idx++) {
             // 参数
             Parameter parameter = parameters[idx];
+            // 参数的类型
+            Class<?> clazz = parameter.getType();
 
             Object result = null;
 
             // 尝试从 context 解析
             if (context != null) {
-                result = context.resolveBean(parameter.getType(), null); // TODO 根据名字注入 @Inject("foo")
+                result = context.resolveBean(clazz, null); // TODO 根据名字注入 @Inject("foo")
             }
             // 尝试从 objs 解析
             if (result == null && objs != null) {
-                result = objs.get(parameter.getType()); // TODO 超类？
+                List<Object> resultList = objs.stream()
+                        .filter(i -> clazz.isAssignableFrom(i.getClass()))
+                        .collect(Collectors.toList());
+
+                if (resultList.size() == 1) {
+                    result = resultList.get(0);
+                }
             }
             // 尝试按顺序解析参数
-            if (byIdxParams != null && byIdxParams.size() > paramIdx) {
+            if (result == null && byIdxParams != null && byIdxParams.size() > paramIdx) {
                 result = ParameterInject.tryResolve(parameter, byIdxParams.get(paramIdx));
                 if (result != null) {
-                    idx += 1;
+                    paramIdx += 1;
                 }
             }
 

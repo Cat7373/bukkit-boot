@@ -183,7 +183,10 @@ public final class PluginContextManager {
                     throw Lang.wrapThrow(e);
                 }
             });
+        });
 
+        // 遍历插件
+        forEachPlugins(context -> {
             // 命令的初始化
             context.getCommandManager().initial(context.getPlugin());
         });

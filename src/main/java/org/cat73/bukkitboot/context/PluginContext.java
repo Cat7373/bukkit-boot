@@ -75,8 +75,6 @@ public final class PluginContext {
             beanName = bean.getClass().getSimpleName();
             beanName = Character.toLowerCase(beanName.charAt(0)) + beanName.substring(1);
         }
-        // class
-        Class<?> clazz = bean.getClass();
 
         // 校验重复
         if (name2Bean.containsKey(beanName)) {
