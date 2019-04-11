@@ -122,7 +122,7 @@ public final class PluginContextManager {
 
     // TODO javadoc
     private static void registerBean(@Nonnull PluginContext context, @Nonnull Class<?> clazz) {
-        registerBean(context, clazz);
+        registerBean(context, clazz, null);
     }
 
     // TODO javadoc
