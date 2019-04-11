@@ -11,6 +11,14 @@ import java.lang.reflect.Method;
 @Value
 public class CommandInfo {
     /**
+     * 命令的名称(实际被注册的命令名)
+     */
+    private final String name;
+    /**
+     * 命令的简写(执行时用的命令名)
+     */
+    private final String alias;
+    /**
      * 命令的执行方法
      */
     private final Method method;
@@ -21,5 +29,5 @@ public class CommandInfo {
     /**
      * 命令执行器的 Bean
      */
-    private Object bean;
+    private final Object bean;
 }

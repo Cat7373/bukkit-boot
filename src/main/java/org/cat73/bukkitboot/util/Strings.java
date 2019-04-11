@@ -1,5 +1,7 @@
 package org.cat73.bukkitboot.util;
 
+import javax.annotation.Nullable;
+
 /**
  * 字符串工具类
  */
@@ -14,7 +16,7 @@ public final class Strings {
      * @param chs 被判断的字符序列
      * @return 判断结果
      */
-    public static boolean isBlank(CharSequence chs) {
+    public static boolean isBlank(@Nullable CharSequence chs) {
         if (Strings.notEmpty(chs)) {
             for (int i = chs.length() - 1; i >= 0; i--) {
                 if (!Character.isWhitespace(chs.charAt(i))) {
@@ -32,7 +34,7 @@ public final class Strings {
      * @param chs 被判断的字符序列
      * @return 判断结果
      */
-    public static boolean notBlank(CharSequence chs) {
+    public static boolean notBlank(@Nullable CharSequence chs) {
         return !Strings.isBlank(chs);
     }
 
@@ -41,7 +43,7 @@ public final class Strings {
      * @param chs 被判断的字符序列
      * @return 判断结果
      */
-    public static boolean isEmpty(CharSequence chs) {
+    public static boolean isEmpty(@Nullable CharSequence chs) {
         return chs == null || chs.length() == 0;
     }
 
@@ -50,7 +52,7 @@ public final class Strings {
      * @param chs 被判断的字符序列
      * @return 判断结果
      */
-    public static boolean notEmpty(CharSequence chs) {
+    public static boolean notEmpty(@Nullable CharSequence chs) {
         return !Strings.isEmpty(chs);
     }
 }

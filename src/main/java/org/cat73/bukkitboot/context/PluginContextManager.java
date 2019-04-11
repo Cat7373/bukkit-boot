@@ -93,6 +93,25 @@ public final class PluginContextManager {
     }
 
     /**
+     * 预销毁被注册的插件
+     */
+    public static void preDestroy() {
+        // 遍历 Bean
+        forEachBeans((context, bean) -> {
+            // 搜索并遍历包含 @PreDestroy 注解的字段
+            Reflects.forEachMethodByAnnotation(bean.getClass(), PreDestroy.class, (method, annotation) -> {
+                // 调用预销毁方法
+                try {
+                    Object[] params = ParameterInject.resolve(context, null, null, method.getParameters());
+                    method.invoke(bean, params);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw Lang.wrapThrow(e);
+                }
+            });
+        });
+    }
+
+    /**
      * 初始化 - 步骤1 - 创建所有 Bean
      */
     private static void createBeans() {
@@ -120,12 +139,21 @@ public final class PluginContextManager {
         });
     }
 
-    // TODO javadoc
+    /**
+     * 注册一个 Bean，会判断条件注解如 @NMSVersion，不符合条件时会放弃注册
+     * @param context 插件的上下文
+     * @param clazz Bean 的 Class
+     */
     private static void registerBean(@Nonnull PluginContext context, @Nonnull Class<?> clazz) {
         registerBean(context, clazz, null);
     }
 
-    // TODO javadoc
+    /**
+     * 注册一个 Bean，会判断条件注解如 @NMSVersion，不符合条件时会放弃注册
+     * @param context 插件的上下文
+     * @param clazz Bean 的 Class
+     * @param name Bean 的名称
+     */
     private static void registerBean(@Nonnull PluginContext context, @Nonnull Class<?> clazz, @Nullable String name) {
         // 校验 NMSVersion
         NMSVersion nmsVersion = clazz.getAnnotation(NMSVersion.class);
@@ -181,7 +209,7 @@ public final class PluginContextManager {
      * </ul>
      */
     private static void autoRegister() {
-        // 遍历 Bean
+        // 遍历 Bean，各管理器的注册
         forEachBeans((context, bean) -> {
             context.getListenerManager().register(context, bean);
             context.getScheduleManager().register(context, bean);
@@ -209,8 +237,10 @@ public final class PluginContextManager {
 
         // 遍历插件
         forEachPlugins(context -> {
-            // 命令的初始化
-            context.getCommandManager().initial(context.getPlugin());
+            // 各管理器的初始化
+            context.getListenerManager().initialize(context);
+            context.getScheduleManager().initialize(context);
+            context.getCommandManager().initialize(context);
         });
     }
 

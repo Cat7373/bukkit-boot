@@ -89,6 +89,25 @@ public enum NMS {
         return UNKNOWN;
     }
 
-    // TODO nmsClass
-    // TODO cbClass
+    /**
+     * 获取 NMS Class(net.minecraft.server.*)
+     * @param className 类名
+     * @return 获取到的类
+     * @throws ClassNotFoundException 如果类不存在
+     */
+    @Nonnull
+    public static Class<?> nms(@Nonnull String className) throws ClassNotFoundException {
+        return Class.forName(String.format("net.minecraft.server.%s.%s", NMS.CURRENT_NMS_VERSION_NAME, className));
+    }
+
+    /**
+     * 获取 CraftBukkit Class(org.bukkit.craftbukkit.*)
+     * @param className 类名
+     * @return 获取到的类
+     * @throws ClassNotFoundException 如果类不存在
+     */
+    @Nonnull
+    public static Class<?> cb(@Nonnull String className) throws ClassNotFoundException {
+        return Class.forName(String.format("org.bukkit.craftbukkit.%s.%s", NMS.CURRENT_NMS_VERSION_NAME, className));
+    }
 }

@@ -22,13 +22,12 @@ public final class Scans {
 
     /**
      * 从一个 Class 对象作为引子，扫描其所在的包内的所有 Class 并返回
-     * <p>只支持 jar 包和 zip 包</p>
+     * <p>只支持 jar 包</p>
      *
      * @param clazz 作为引子的 Class 对象
      * @return 扫描到的所有 Class 对象
      * @throws IOException 如果扫描过程中出现了 IO 异常
      */
-    // TODO zip 包的支持
     @Nonnull
     public static List<Class<?>> scanClass(@Nonnull Class<?> clazz) throws IOException {
         // 获取 Class 所在的 jar 包

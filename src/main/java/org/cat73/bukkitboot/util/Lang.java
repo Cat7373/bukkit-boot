@@ -62,6 +62,7 @@ public final class Lang {
      * @return 永远不会返回任何东西，返回值只是为了方便在必须有返回值的方法中 throw 出去来通过语法检查的。
      * @throws T 直接抛出传入的异常
      */
+    @Nonnull // 实际上一定不会返回的
     @SuppressWarnings("unchecked")
     public static <T extends Throwable> RuntimeException throwAny(@Nonnull Throwable e) throws T {
         throw (T) e;
@@ -73,7 +74,7 @@ public final class Lang {
      * @param <T> 返回值参数的数据类型
      * @return 返回的数据
      */
-    @Nonnull
+    @Nullable
     public static <T> T wrapCode(@Nonnull ThrowableSupplier<T> s) {
         try {
             return s.get();
@@ -220,7 +221,13 @@ public final class Lang {
          */
         @Nonnull
         default Predicate<T> wrap() {
-            return p -> Lang.wrapCode(() -> this.test(p));
+            return p -> {
+                try {
+                    return this.test(p);
+                } catch (Exception e) {
+                    throw Lang.wrapThrow(e);
+                }
+            };
         }
     }
 

@@ -41,12 +41,14 @@ public final class Reflects {
      * @param <T> 注解的类型
      */
     public static <T extends Annotation> void forEachDeclaredFieldByAnnotation(@Nonnull Class<?> clazz, @Nonnull Class<T> annotationClazz, @Nonnull Lang.ThrowableBiConsumer<Field, T> action) {
-        for (Field field : clazz.getDeclaredFields()) { // TODO 遍历超类
-            T annotation = field.getAnnotation(annotationClazz);
-            if (annotation != null) {
-                action.wrap().accept(field, annotation);
+        forEachSuperClasses(clazz, c -> {
+            for (Field field : c.getDeclaredFields()) {
+                T annotation = field.getAnnotation(annotationClazz);
+                if (annotation != null) {
+                    action.wrap().accept(field, annotation);
+                }
             }
-        }
+        });
     }
 
     /**
@@ -71,9 +73,23 @@ public final class Reflects {
      * @param action 要进行的操作
      */
     public static void forEachMethods(@Nonnull Class<?> clazz, @Nonnull Lang.ThrowableConsumer<Method> action) {
-        for (Method method : clazz.getMethods()) { // TODO 遍历超类
-            action.wrap().accept(method);
-        }
+        forEachSuperClasses(clazz, c -> {
+            for (Method method : c.getMethods()) {
+                action.wrap().accept(method);
+            }
+        });
+    }
+
+    /**
+     * 遍历一个类的超类，注意类自己也会被执行操作
+     * @param clazz 被遍历的类
+     * @param action 要进行的操作
+     */
+    public static void forEachSuperClasses(@Nonnull Class<?> clazz, @Nonnull Lang.ThrowableConsumer<Class<?>> action) {
+        Class<?> c = clazz;
+        do {
+            action.wrap().accept(c);
+        } while ((c = c.getSuperclass()) != null);
     }
 
     /**

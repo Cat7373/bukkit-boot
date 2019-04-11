@@ -9,10 +9,11 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = ElementType.TYPE) // TODO 支持在 Method 上
 @Documented
+@Inherited
 public @interface Bean {
     /**
      * Bean 的名字
-     * <p>默认会使用类名</p>
+     * <p>默认会使用小驼峰式的类名</p>
      * @return Bean 的名字
      */
     String name() default "";

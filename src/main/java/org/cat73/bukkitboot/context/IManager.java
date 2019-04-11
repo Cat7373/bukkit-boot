@@ -12,4 +12,10 @@ public interface IManager {
      * @param bean 被注册的 Bean
      */
     void register(@Nonnull PluginContext context, @Nonnull Object bean);
+
+    /**
+     * 初始化
+     * @param context 插件的上下文
+     */
+    default void initialize(@Nonnull PluginContext context) {}
 }

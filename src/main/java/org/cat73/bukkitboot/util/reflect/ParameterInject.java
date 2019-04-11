@@ -1,13 +1,14 @@
 package org.cat73.bukkitboot.util.reflect;
 
+import org.cat73.bukkitboot.annotation.Inject;
 import org.cat73.bukkitboot.context.PluginContext;
+import org.cat73.bukkitboot.util.Lang;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.lang.reflect.Field;
 import java.lang.reflect.Parameter;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -18,27 +19,51 @@ public final class ParameterInject {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * 空白数组
+     */
     private static final Object[] EMPTY_OBJECT_ARRAY = new Object[] {};
+    /**
+     * 默认的 Inject 注解
+     */
+    @Inject
+    private static final Inject DEFAULT_INJECT;
+
+    static {
+        try {
+            Field field = ParameterInject.class.getDeclaredField("DEFAULT_INJECT");
+            DEFAULT_INJECT = field.getAnnotation(Inject.class);
+        } catch (NoSuchFieldException e) {
+            throw Lang.noImplement();
+        }
+    }
 
     /**
      * 尝试解决一些参数
      * @param context 插件的上下文(可选，如果希望从上下文中解决依赖)
      * @param objs 自定义的实体列表
-     * @param byIdxParams 基于顺序的参数，如果从上面两个中无法解决依赖，且参数类型为基本数据类型或其包装类，或为 String，则从这里来按顺序解析，每次成功解析则后移一个元素
+     * @param byIdxParams 基于顺序的参数，如果从上面两个中无法解决依赖，且参数类型为基本数据类型或其包装类，或为 String，则从这里来按顺序解析
+     *                    <p>每次成功解析则后移一个元素，不允许出现 null 元素</p>
      * @param parameters 要被解决的参数数组
      * @return 解决后的值实例数组
      */
-    // TODO byIdxParams 可迭代即可
-    public static Object[] resolve(@Nullable PluginContext context, @Nullable Collection<?> objs, @Nullable List<String> byIdxParams, @Nonnull Parameter[] parameters) {
+    @Nonnull
+    public static Object[] resolve(@Nullable PluginContext context, @Nullable Collection<?> objs, @Nullable Iterable<String> byIdxParams, @Nonnull Parameter[] parameters) {
         if (parameters.length == 0) {
             return EMPTY_OBJECT_ARRAY;
         }
 
         Object[] results = new Object[parameters.length];
-        int paramIdx = 0;
+        Iterator<String> it = Optional.ofNullable(byIdxParams).map(Iterable::iterator).orElse(null);
+        String byIdxParam = null;
         for (int idx = 0; idx < parameters.length; idx++) {
             // 参数
             Parameter parameter = parameters[idx];
+            // 注入注解
+            Inject inject = parameter.getAnnotation(Inject.class);
+            if (inject == null) {
+                inject = DEFAULT_INJECT;
+            }
             // 参数的类型
             Class<?> clazz = parameter.getType();
 
@@ -46,7 +71,7 @@ public final class ParameterInject {
 
             // 尝试从 context 解析
             if (context != null) {
-                result = context.resolveBean(clazz, null); // TODO 根据名字注入 @Inject("foo")
+                result = context.resolveBean(clazz, inject.name());
             }
             // 尝试从 objs 解析
             if (result == null && objs != null) {
@@ -59,15 +84,20 @@ public final class ParameterInject {
                 }
             }
             // 尝试按顺序解析参数
-            if (result == null && byIdxParams != null && byIdxParams.size() > paramIdx) {
-                result = ParameterInject.tryResolve(parameter, byIdxParams.get(paramIdx));
-                if (result != null) {
-                    paramIdx += 1;
+            if (result == null && it != null) {
+                if (byIdxParam == null && it.hasNext()) {
+                    byIdxParam = it.next();
+                }
+                if (byIdxParam != null) {
+                    result = ParameterInject.tryResolve(parameter, byIdxParam);
+                    if (result != null) {
+                        byIdxParam = null;
+                    }
                 }
             }
 
-            // TODO 允许可选参(注意考虑上面的顺序？
-            if (result == null) {
+            // 如果是必须的参数，且未解析成功，则报错
+            if (result == null && inject.required()) {
                 throw new NullPointerException(String.format("无法解析参数: %s", parameter));
             }
 
@@ -85,28 +115,33 @@ public final class ParameterInject {
      * @param str 字符串
      * @return 解决结果，如解决失败，则会返回 null
      */
+    @Nullable
     private static Object tryResolve(@Nonnull Parameter parameter, @Nonnull String str) {
         Class<?> type = parameter.getType();
 
-        if (type == boolean.class || type == Boolean.class) {
-            // boolean / Boolean: true / false、1 / 0、y / n、yes / no
-            return Objects.equals(str, "true") || Objects.equals(str, "1") || Objects.equals(str, "y") || Objects.equals(str, "yes");
-        } else if (type == byte.class || type == Byte.class) {
-            return Byte.valueOf(str);
-        } else if (type == short.class || type == Short.class) {
-            return Short.valueOf(str);
-        } else if (type == char.class || type == Character.class) {
-            return str.charAt(0);
-        } else if (type == int.class || type == Integer.class) {
-            return Integer.valueOf(str);
-        } else if (type == float.class || type == Float.class) {
-            return Float.valueOf(str);
-        } else if (type == long.class || type == Long.class) {
-            return Long.valueOf(str);
-        } else if (type == double.class || type == Double.class) {
-            return Double.valueOf(str);
-        } else if (type == String.class) {
-            return str;
+        try {
+            if (type == boolean.class || type == Boolean.class) {
+                // boolean / Boolean: true / false、1 / 0、y / n、yes / no
+                return Objects.equals(str, "true") || Objects.equals(str, "1") || Objects.equals(str, "y") || Objects.equals(str, "yes");
+            } else if (type == byte.class || type == Byte.class) {
+                return Byte.valueOf(str);
+            } else if (type == short.class || type == Short.class) {
+                return Short.valueOf(str);
+            } else if (type == char.class || type == Character.class) {
+                return str.charAt(0);
+            } else if (type == int.class || type == Integer.class) {
+                return Integer.valueOf(str);
+            } else if (type == float.class || type == Float.class) {
+                return Float.valueOf(str);
+            } else if (type == long.class || type == Long.class) {
+                return Long.valueOf(str);
+            } else if (type == double.class || type == Double.class) {
+                return Double.valueOf(str);
+            } else if (type == String.class) {
+                return str;
+            }
+        } catch (Exception e) {
+            // quiet
         }
 
         return null;

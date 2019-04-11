@@ -1,16 +1,15 @@
 package org.cat73.bukkitboot.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * 定时任务
  */
-// TODO 允许多个
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@Repeatable(Scheduleds.class)
 public @interface Scheduled {
     /**
      * 首次运行之前的等待时间(tick)

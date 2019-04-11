@@ -10,6 +10,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+@Inherited
 @Repeatable(NMSVersions.class)
 public @interface NMSVersion {
     /**

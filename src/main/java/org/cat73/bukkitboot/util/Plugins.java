@@ -1,6 +1,7 @@
 package org.cat73.bukkitboot.util;
 
 import org.bukkit.plugin.Plugin;
+import org.cat73.bukkitboot.context.PluginContext;
 import org.cat73.bukkitboot.context.PluginContextManager;
 
 import javax.annotation.Nonnull;
@@ -20,6 +21,15 @@ public final class Plugins {
     @Nonnull
     @SuppressWarnings("unchecked")
     public static <T extends Plugin> T current() {
-        return (T) PluginContextManager.current().getPlugin();
+        return (T) currentContext().getPlugin();
+    }
+
+    /**
+     * 获取当前插件的上下文
+     * @return 当前插件的上下文
+     */
+    @Nonnull
+    public static PluginContext currentContext() {
+        return PluginContextManager.current();
     }
 }

@@ -43,6 +43,12 @@ public final class BukkitBoot extends JavaPlugin {
         PluginContextManager.initialize();
     }
 
+    @Override
+    public void onDisable() {
+        // 销毁插件
+        PluginContextManager.preDestroy();
+    }
+
     /**
      * 启动失败，终止服务器并抛出初始化错误
      * @param msg 错误信息的格式
