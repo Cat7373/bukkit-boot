@@ -97,9 +97,9 @@ public final class PluginContextManager {
      */
     public static void preDestroy() {
         // 遍历 Bean
-        forEachBeans((context, bean) -> {
+        lookupBeans((context, bean) -> {
             // 搜索并遍历包含 @PreDestroy 注解的字段
-            Reflects.forEachMethodByAnnotation(bean.getClass(), PreDestroy.class, (method, annotation) -> {
+            Reflects.lookupMethodByAnnotation(bean.getClass(), PreDestroy.class, (method, annotation) -> {
                 // 调用预销毁方法
                 try {
                     Object[] params = ParameterInject.resolve(context, null, null, method.getParameters());
@@ -116,7 +116,7 @@ public final class PluginContextManager {
      */
     private static void createBeans() {
         // 遍历插件
-        forEachPlugins(context -> {
+        lookupPlugins(context -> {
             // 注册插件主类
             context.registerBean(context.getPlugin());
             // 注册 Context
@@ -177,9 +177,9 @@ public final class PluginContextManager {
      */
     private static void injectionDependencies() {
         // 遍历 Bean
-        forEachBeans((context, bean) -> {
+        lookupBeans((context, bean) -> {
             // 搜索并遍历包含注入注解的字段
-            Reflects.forEachDeclaredFieldByAnnotation(bean.getClass(), Inject.class, (field, annotation) -> {
+            Reflects.lookupDeclaredFieldByAnnotation(bean.getClass(), Inject.class, (field, annotation) -> {
                 // 根据类型搜索注入的属性
                 Class<?> type = field.getType();
                 Object injectBean = context.resolveBean(type, annotation.name());
@@ -210,7 +210,7 @@ public final class PluginContextManager {
      */
     private static void autoRegister() {
         // 遍历 Bean，各管理器的注册
-        forEachBeans((context, bean) -> {
+        lookupBeans((context, bean) -> {
             context.getListenerManager().register(context, bean);
             context.getScheduleManager().register(context, bean);
             context.getCommandManager().register(context, bean);
@@ -222,9 +222,9 @@ public final class PluginContextManager {
      */
     private static void invokePostConstructs() {
         // 遍历 Bean
-        forEachBeans((context, bean) -> {
+        lookupBeans((context, bean) -> {
             // 搜索并遍历包含初始化注解的方法
-            Reflects.forEachMethodByAnnotation(bean.getClass(), PostConstruct.class, (method, annotation) -> {
+            Reflects.lookupMethodByAnnotation(bean.getClass(), PostConstruct.class, (method, annotation) -> {
                 // 调用初始化方法
                 try {
                     Object[] params = ParameterInject.resolve(context, null, null, method.getParameters());
@@ -236,7 +236,7 @@ public final class PluginContextManager {
         });
 
         // 遍历插件
-        forEachPlugins(context -> {
+        lookupPlugins(context -> {
             // 各管理器的初始化
             context.getListenerManager().initialize(context);
             context.getScheduleManager().initialize(context);
@@ -248,7 +248,7 @@ public final class PluginContextManager {
      * 遍历插件
      * @param action 对于每个插件需要做的操作
      */
-    private static void forEachPlugins(@Nonnull Lang.ThrowableConsumer<PluginContext> action) {
+    private static void lookupPlugins(@Nonnull Lang.ThrowableConsumer<PluginContext> action) {
         for (PluginContext context : plugin2context.values()) {
             action.wrap().accept(context);
         }
@@ -258,7 +258,7 @@ public final class PluginContextManager {
      * 遍历 Bean
      * @param action 对于每个 Bean 要做的操作
      */
-    private static void forEachBeans(@Nonnull Lang.ThrowableBiConsumer<PluginContext, Object> action) {
+    private static void lookupBeans(@Nonnull Lang.ThrowableBiConsumer<PluginContext, Object> action) {
         for (PluginContext context : plugin2context.values()) {
             for (BeanInfo beanInfo : context.getBeans()) {
                 action.wrap().accept(context, beanInfo.getBean());

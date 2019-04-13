@@ -25,8 +25,8 @@ public class ScheduleManager implements IManager {
 
     @Override
     public void register(@Nonnull PluginContext context, @Nonnull Object bean) {
-        Reflects.forEachMethodByAnnotation(bean.getClass(), Scheduled.class, (m, a) -> this.register(context, bean, m, a));
-        Reflects.forEachMethodByAnnotation(bean.getClass(), Scheduleds.class, (m, a) -> {
+        Reflects.lookupMethodByAnnotation(bean.getClass(), Scheduled.class, (m, a) -> this.register(context, bean, m, a));
+        Reflects.lookupMethodByAnnotation(bean.getClass(), Scheduleds.class, (m, a) -> {
             for (Scheduled annotation : a.value()) {
                 this.register(context, bean, m, annotation);
             }

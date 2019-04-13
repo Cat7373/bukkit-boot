@@ -71,7 +71,7 @@ public enum NMS {
     /**
      * 当前正运行的服务器的 NMS 版本
      **/
-    public static final NMS CURRENT_NMS_VERSION = NMS.valueOf(CURRENT_NMS_VERSION_NAME);
+    public static final NMS CURRENT_NMS_VERSION = NMS.forName(CURRENT_NMS_VERSION_NAME);
 
     /**
      * 基于版本的名字获取枚举实例

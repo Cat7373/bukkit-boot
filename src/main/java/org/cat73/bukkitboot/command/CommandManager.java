@@ -45,7 +45,7 @@ public class CommandManager implements IManager, CommandExecutor {
 
     @Override
     public void register(@Nonnull PluginContext context, @Nonnull Object bean) {
-        Reflects.forEachMethodByAnnotation(bean.getClass(), Command.class, (method, annotation) -> {
+        Reflects.lookupMethodByAnnotation(bean.getClass(), Command.class, (method, annotation) -> {
             // 注册 name
             String name = annotation.name();
             if (Strings.isEmpty(name)) {

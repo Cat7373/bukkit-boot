@@ -1,0 +1,32 @@
+name: GetCommand
+version: 1.0.2
+main: org.cat73.getcommand.GetCommand
+authors: [Cat73]
+website: https://github.com/Cat7373/GetCommand
+depends: [Bukkit-Boot]
+commands:
+  getcommand:
+    usage: /<command> help
+    permission: getcommand.use
+    permission-message: You don't have <permission>
+permissions:
+  getcommand.use:
+    default: op
+  getcommand.item:
+    default: op
+  getcommand.block:
+    default: op
+  getcommand.entity:
+    default: op
+  getcommand.save:
+    default: op
+  getcommand.save.chat:
+    default: op
+  getcommand.save.file:
+    default: op
+  getcommand.save.console:
+    default: op
+  getcommand.save.command_block:
+    default: op
+  getcommand.cancel:
+    default: op

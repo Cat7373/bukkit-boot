@@ -3,7 +3,6 @@ package org.cat73.bukkitboot.context;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.bukkit.plugin.Plugin;
 import org.cat73.bukkitboot.BukkitBoot;
@@ -55,12 +54,10 @@ public final class PluginContext {
     /**
      * Bean 列表
      */
-    @Setter(AccessLevel.PRIVATE)
     private List<BeanInfo> beans = new ArrayList<>();
     /**
      * 基于 name 的 Bean 速查表
      */
-    @Setter(AccessLevel.PRIVATE)
     private Map<String, BeanInfo> name2Bean = new HashMap<>();
 
     /**
@@ -112,10 +109,13 @@ public final class PluginContext {
                 .map(BeanInfo::getBean)
                 .collect(Collectors.toList());
 
+        if (resultList.isEmpty()) {
+            // 尝试从公共 Bean 里找
+        }
+
         if (resultList.size() != 1) {
             return null;
         }
-
         return resultList.get(0);
     }
 
