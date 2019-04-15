@@ -1,4 +1,6 @@
-package org.cat73.bukkitboot.annotation;
+package org.cat73.bukkitboot.annotation.core;
+
+import org.cat73.bukkitboot.annotation.command.Command;
 
 import java.lang.annotation.*;
 

@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import org.bukkit.plugin.Plugin;
 import org.cat73.bukkitboot.BukkitBoot;
-import org.cat73.bukkitboot.annotation.BukkitBootPlugin;
+import org.cat73.bukkitboot.annotation.core.BukkitBootPlugin;
 import org.cat73.bukkitboot.command.CommandManager;
 import org.cat73.bukkitboot.context.bean.BeanInfo;
 import org.cat73.bukkitboot.listener.ListenerManager;

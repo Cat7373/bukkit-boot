@@ -1,6 +1,6 @@
 package org.cat73.bukkitboot.util.reflect;
 
-import org.cat73.bukkitboot.annotation.Inject;
+import org.cat73.bukkitboot.annotation.core.Inject;
 import org.cat73.bukkitboot.context.PluginContext;
 import org.cat73.bukkitboot.util.Lang;
 

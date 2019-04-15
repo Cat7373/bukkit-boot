@@ -1,7 +1,7 @@
 package org.cat73.getcommand;
 
 import org.bukkit.plugin.java.JavaPlugin;
-import org.cat73.bukkitboot.annotation.BukkitBootPlugin;
+import org.cat73.bukkitboot.annotation.core.BukkitBootPlugin;
 
 /**
  * 插件主类

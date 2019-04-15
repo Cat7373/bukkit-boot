@@ -3,8 +3,9 @@ package org.cat73.bukkitboot.command.internal;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.cat73.bukkitboot.annotation.Command;
-import org.cat73.bukkitboot.annotation.Inject;
+import org.cat73.bukkitboot.annotation.command.Command;
+import org.cat73.bukkitboot.annotation.command.TabCompleter;
+import org.cat73.bukkitboot.annotation.core.Inject;
 import org.cat73.bukkitboot.command.CommandInfo;
 import org.cat73.bukkitboot.command.CommandManager;
 import org.cat73.bukkitboot.util.Strings;
@@ -61,6 +62,32 @@ public class HelpCommand {
                 // 输出指定页码的帮助信息
                 this.sendHelp(sender, page);
             }
+        }
+    }
+
+    /**
+     * help 的 Tab 补全器
+     * @param sender 命令的执行者
+     * @param name help 后的首个参数(子命令名，页码不支持补全)
+     * @return 可补全出的参数列表
+     */
+    @TabCompleter(name = "help")
+    public List<String> tabCompleter(@Nonnull CommandSender sender, @Nullable @Inject(required = false) String name) {
+        if (Strings.isEmpty(name)) {
+            // 补全部子命令
+            return this.commandManager.getCommandInfos().entrySet().stream()
+                    .filter(e -> this.hasPermissions(sender, e.getValue().getCommand().permission()))
+                    .filter(e -> this.checkTarget(sender, e.getValue().getCommand().target()))
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+        } else {
+            // 补特定前缀的子命令
+            return this.commandManager.getCommandInfos().entrySet().stream()
+                    .filter(e -> e.getKey().startsWith(name))
+                    .filter(e -> this.hasPermissions(sender, e.getValue().getCommand().permission()))
+                    .filter(e -> this.checkTarget(sender, e.getValue().getCommand().target()))
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
         }
     }
 

@@ -10,8 +10,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.cat73.bukkitboot.annotation.Bean;
-import org.cat73.bukkitboot.annotation.Inject;
+import org.cat73.bukkitboot.annotation.core.Bean;
+import org.cat73.bukkitboot.annotation.core.Inject;
 import org.cat73.getcommand.nms.ISetBlockCommandGenerator;
 import org.cat73.getcommand.status.PlayersStatus;
 

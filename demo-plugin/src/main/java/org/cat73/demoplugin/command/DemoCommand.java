@@ -2,8 +2,8 @@ package org.cat73.demoplugin.command;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.cat73.bukkitboot.annotation.Bean;
-import org.cat73.bukkitboot.annotation.Command;
+import org.cat73.bukkitboot.annotation.core.Bean;
+import org.cat73.bukkitboot.annotation.command.Command;
 import org.cat73.bukkitboot.util.Logger;
 
 import java.util.Arrays;

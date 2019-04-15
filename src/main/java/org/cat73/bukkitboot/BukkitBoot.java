@@ -69,7 +69,4 @@ public final class BukkitBoot extends JavaPlugin {
             throw new InitializeError(String.format(msg, args), ex);
         }
     }
-
-    // TODO 暂不支持重载(Spigot 已不建议使用 /reload)
-    // TODO 暂不支持 onDisable，如果需要插件现在应自行覆盖这个方法来操作
 }

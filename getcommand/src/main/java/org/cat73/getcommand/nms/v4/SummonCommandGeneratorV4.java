@@ -1,8 +1,8 @@
 package org.cat73.getcommand.nms.v4;
 
 import org.bukkit.entity.Entity;
-import org.cat73.bukkitboot.annotation.Bean;
-import org.cat73.bukkitboot.annotation.NMSVersion;
+import org.cat73.bukkitboot.annotation.core.Bean;
+import org.cat73.bukkitboot.annotation.core.NMSVersion;
 import org.cat73.bukkitboot.util.reflect.NMS;
 import org.cat73.bukkitboot.util.reflect.Reflects;
 import org.cat73.getcommand.nms.ISummonCommandGenerator;

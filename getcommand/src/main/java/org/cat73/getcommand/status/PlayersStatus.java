@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.cat73.bukkitboot.annotation.Bean;
+import org.cat73.bukkitboot.annotation.core.Bean;
 
 import java.util.HashMap;
 import java.util.Map;

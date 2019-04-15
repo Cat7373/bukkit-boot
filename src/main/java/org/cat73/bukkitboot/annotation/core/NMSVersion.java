@@ -1,4 +1,4 @@
-package org.cat73.bukkitboot.annotation;
+package org.cat73.bukkitboot.annotation.core;
 
 import org.cat73.bukkitboot.util.reflect.NMS;
 

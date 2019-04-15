@@ -4,12 +4,17 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.cat73.bukkitboot.annotation.Bean;
-import org.cat73.bukkitboot.annotation.Command;
-import org.cat73.bukkitboot.annotation.Inject;
+import org.cat73.bukkitboot.annotation.command.Command;
+import org.cat73.bukkitboot.annotation.command.TabCompleter;
+import org.cat73.bukkitboot.annotation.core.Bean;
+import org.cat73.bukkitboot.annotation.core.Inject;
 import org.cat73.bukkitboot.util.Strings;
 import org.cat73.getcommand.nms.IGiveCommandGenerator;
 import org.cat73.getcommand.status.PlayersStatus;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 插件的命令
@@ -165,6 +170,27 @@ public class Commands {
             }
         } else {
             player.sendMessage(String.format("%s当前没有已获取到的命令", ChatColor.RED));
+        }
+    }
+
+    /**
+     * Save 命令的模式列表
+     */
+    private static final List<String> saveModes = Arrays.asList("chat", "cb", "command_block", "c", "console", "f", "file");
+
+    /**
+     * Save 命令的 Tab 补全器
+     * @param mode 保存模式
+     * @return 可补全出的参数列表
+     */
+    @TabCompleter(name = "save")
+    public List<String> saveTabCompleter(@Inject(required = false) String mode) {
+        if (Strings.isEmpty(mode)) {
+            return saveModes;
+        } else {
+            return saveModes.stream()
+                    .filter(m -> m.startsWith(mode))
+                    .collect(Collectors.toList());
         }
     }
 }

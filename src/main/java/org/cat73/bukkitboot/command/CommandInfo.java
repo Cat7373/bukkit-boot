@@ -1,7 +1,7 @@
 package org.cat73.bukkitboot.command;
 
 import lombok.Value;
-import org.cat73.bukkitboot.annotation.Command;
+import org.cat73.bukkitboot.annotation.command.Command;
 
 import java.lang.reflect.Method;
 

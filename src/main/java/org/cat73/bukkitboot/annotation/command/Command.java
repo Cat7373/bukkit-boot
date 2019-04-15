@@ -1,4 +1,4 @@
-package org.cat73.bukkitboot.annotation;
+package org.cat73.bukkitboot.annotation.command;
 
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
@@ -9,10 +9,11 @@ import org.bukkit.entity.minecart.CommandMinecart;
 import java.lang.annotation.*;
 
 /**
- * 一个可以被执行的命令
+ * 一个命令的执行器
  * <p>所需参数会自动注入</p>
  * <!-- TODO 说明可注入的东西 -->
  */
+// TODO 允许多个
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = ElementType.METHOD)
 @Documented

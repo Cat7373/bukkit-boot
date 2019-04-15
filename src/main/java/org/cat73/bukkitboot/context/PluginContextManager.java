@@ -2,7 +2,7 @@ package org.cat73.bukkitboot.context;
 
 import org.bukkit.plugin.Plugin;
 import org.cat73.bukkitboot.BukkitBoot;
-import org.cat73.bukkitboot.annotation.*;
+import org.cat73.bukkitboot.annotation.core.*;
 import org.cat73.bukkitboot.context.bean.BeanInfo;
 import org.cat73.bukkitboot.util.Lang;
 import org.cat73.bukkitboot.util.reflect.NMS;
@@ -221,6 +221,14 @@ public final class PluginContextManager {
      * 初始化 - 步骤4 - 调用初始化方法
      */
     private static void invokePostConstructs() {
+        // 遍历插件
+        lookupPlugins(context -> {
+            // 各管理器的初始化
+            context.getListenerManager().initialize(context);
+            context.getScheduleManager().initialize(context);
+            context.getCommandManager().initialize(context);
+        });
+
         // 遍历 Bean
         lookupBeans((context, bean) -> {
             // 搜索并遍历包含初始化注解的方法
@@ -233,14 +241,6 @@ public final class PluginContextManager {
                     throw Lang.wrapThrow(e);
                 }
             });
-        });
-
-        // 遍历插件
-        lookupPlugins(context -> {
-            // 各管理器的初始化
-            context.getListenerManager().initialize(context);
-            context.getScheduleManager().initialize(context);
-            context.getCommandManager().initialize(context);
         });
     }
 
