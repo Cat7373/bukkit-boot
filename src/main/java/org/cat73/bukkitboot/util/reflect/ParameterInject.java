@@ -2,6 +2,7 @@ package org.cat73.bukkitboot.util.reflect;
 
 import org.cat73.bukkitboot.annotation.core.Inject;
 import org.cat73.bukkitboot.context.PluginContext;
+import org.cat73.bukkitboot.exception.CanNotResolveParameterException;
 import org.cat73.bukkitboot.util.Lang;
 
 import javax.annotation.Nonnull;
@@ -46,9 +47,10 @@ public final class ParameterInject {
      *                    <p>每次成功解析则后移一个元素，不允许出现 null 元素</p>
      * @param parameters 要被解决的参数数组
      * @return 解决后的值实例数组
+     * @throws CanNotResolveParameterException 如果某个必须的参数无法解析
      */
     @Nonnull
-    public static Object[] resolve(@Nullable PluginContext context, @Nullable Collection<?> objs, @Nullable Iterable<String> byIdxParams, @Nonnull Parameter[] parameters) {
+    public static Object[] resolve(@Nullable PluginContext context, @Nullable Collection<?> objs, @Nullable Iterable<String> byIdxParams, @Nonnull Parameter[] parameters) throws CanNotResolveParameterException {
         if (parameters.length == 0) {
             return EMPTY_OBJECT_ARRAY;
         }
@@ -98,7 +100,7 @@ public final class ParameterInject {
 
             // 如果是必须的参数，且未解析成功，则报错
             if (result == null && inject.required()) {
-                throw new NullPointerException(String.format("无法解析参数: %s", parameter));
+                throw new CanNotResolveParameterException(String.format("无法解析参数: %s", parameter));
             }
 
             // 保存结果

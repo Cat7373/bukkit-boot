@@ -8,10 +8,13 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabExecutor;
 import org.cat73.bukkitboot.BukkitBoot;
 import org.cat73.bukkitboot.annotation.command.Command;
+import org.cat73.bukkitboot.annotation.command.Commands;
 import org.cat73.bukkitboot.annotation.command.TabCompleter;
+import org.cat73.bukkitboot.annotation.command.TabCompleters;
 import org.cat73.bukkitboot.command.internal.HelpCommand;
 import org.cat73.bukkitboot.context.IManager;
 import org.cat73.bukkitboot.context.PluginContext;
+import org.cat73.bukkitboot.exception.CanNotResolveParameterException;
 import org.cat73.bukkitboot.util.Lang;
 import org.cat73.bukkitboot.util.Strings;
 import org.cat73.bukkitboot.util.reflect.ParameterInject;
@@ -39,7 +42,7 @@ public class CommandManager implements IManager, TabExecutor {
     /**
      * 命令名到命令的 Tab 补全器的速查表
      */
-    private final Map<String, Method> tabCompletes = new HashMap<>();
+    private final Map<String, TabCompleteInfo> tabCompletes = new HashMap<>();
     /**
      * 主命令名
      */
@@ -49,35 +52,18 @@ public class CommandManager implements IManager, TabExecutor {
     @Override
     public void register(@Nonnull PluginContext context, @Nonnull Object bean) {
         // 注册命令
-        Reflects.lookupMethodByAnnotation(bean.getClass(), Command.class, (method, annotation) -> {
-            // 注册 name
-            String name = annotation.name();
-            if (Strings.isEmpty(name)) {
-                name = method.getName();
-            }
-            name = name.toLowerCase();
-
-            this.register(name, name, annotation, method, bean);
-
-            // 保存命令的信息
-            this.commands.put(name, annotation);
-
-            // 注册 alias
-            for (String alias : annotation.aliases()) {
-                this.register(name, alias, annotation, method, bean);
+        Reflects.lookupMethodByAnnotation(bean.getClass(), Command.class, (method, annotation) -> this.register(bean, method, annotation));
+        Reflects.lookupMethodByAnnotation(bean.getClass(), Commands.class, (method, annotation) -> {
+            for (Command command : annotation.value()) {
+                this.register(bean, method, command);
             }
         });
         // 注册 Tab 补全器
-        Reflects.lookupMethodByAnnotation(bean.getClass(), TabCompleter.class, (method, annotation) -> {
-            // 注册 name
-            String name = annotation.name();
-            if (Strings.isEmpty(name)) {
-                name = method.getName();
+        Reflects.lookupMethodByAnnotation(bean.getClass(), TabCompleter.class, (method, annotation) -> this.register(bean, method, annotation));
+        Reflects.lookupMethodByAnnotation(bean.getClass(), TabCompleters.class, (method, annotation) -> {
+            for (TabCompleter tabCompleter : annotation.value()) {
+                this.register(bean, method, tabCompleter);
             }
-            name = name.toLowerCase();
-
-            // 保存补全器的信息
-            this.tabCompletes.put(name, method);
         });
     }
 
@@ -85,6 +71,7 @@ public class CommandManager implements IManager, TabExecutor {
     public void initialize(@Nonnull PluginContext context) {
         // 如果没有 help，则使用内置的 help
         if (!commandInfos.containsKey("help")) {
+            // TODO 用公共的注册方法
             Method commandMethod;
             Method tabCompleterMethod;
             try {
@@ -93,10 +80,12 @@ public class CommandManager implements IManager, TabExecutor {
             } catch (NoSuchMethodException e) {
                 throw Lang.impossible();
             }
-            Command annotation = commandMethod.getAnnotation(Command.class);
-            this.commands.put("help", annotation);
-            this.register("help", "help", annotation, commandMethod, new HelpCommand(this));
-            this.tabCompletes.put("help", tabCompleterMethod);
+            Command command = commandMethod.getAnnotation(Command.class);
+            TabCompleter tabCompleter = commandMethod.getAnnotation(TabCompleter.class);
+            HelpCommand bean = new HelpCommand(this);
+            this.commands.put("help", command);
+            this.register("help", "help", command, commandMethod, bean);
+            this.tabCompletes.put("help", new TabCompleteInfo(this.commandInfos.get("help"), tabCompleterMethod, tabCompleter, bean));
         }
 
         // TODO 主命令名，等配置部分做完后可自定义
@@ -161,15 +150,26 @@ public class CommandManager implements IManager, TabExecutor {
             }
 
             // 准备参数
-            // TODO 无法解析参数不要炸，输出使用方法
-            Object[] params = ParameterInject.resolve(null, Arrays.asList(sender, command, args, this), Arrays.asList(tmp), subCommandInfo.getMethod().getParameters());
+            Object[] params;
+            try {
+                params = ParameterInject.resolve(null, Arrays.asList(sender, command, args, this, subCommandInfo, annotation), Arrays.asList(tmp), subCommandInfo.getMethod().getParameters());
+            } catch (CanNotResolveParameterException e) {
+                // 如果参数解析失败则打印该子命令的使用方法
+                if (Strings.notEmpty(annotation.usage())) {
+                    sender.sendMessage(String.format("usage: %s/%s %s %s", ChatColor.GREEN, this.getBaseCommandName(), subCommandInfo.getName(), annotation.usage()));
+                }
+                return true;
+            }
 
             // 执行子命令
             try {
                 // 执行子命令
                 Object result = subCommandInfo.getMethod().invoke(subCommandInfo.getBean(), params);
                 if (result instanceof Boolean && !((Boolean) result)) {
-                    // TODO 如果返回 false 则打印该子命令的使用方法
+                    // 如果返回 false 则打印该子命令的使用方法
+                    if (Strings.notEmpty(annotation.usage())) {
+                        sender.sendMessage(String.format("usage: %s/%s %s %s", ChatColor.GREEN, this.getBaseCommandName(), subCommandInfo.getName(), annotation.usage()));
+                    }
                 }
             } catch (Exception e) {
                 // 如果出现任何未捕获的异常则打印提示
@@ -216,8 +216,8 @@ public class CommandManager implements IManager, TabExecutor {
                 return Collections.emptyList();
             } else {
                 // 获取命令的补全器
-                Method method = this.tabCompletes.get(subCommandInfo.getName());
-                if (method == null) {
+                TabCompleteInfo tabCompleteInfo = this.tabCompletes.get(subCommandInfo.getName());
+                if (tabCompleteInfo == null) {
                     // 没找到则返回空白
                     return Collections.emptyList();
                 } else {
@@ -226,12 +226,17 @@ public class CommandManager implements IManager, TabExecutor {
                     System.arraycopy(args, 1, tmp, 0, args.length - 1);
 
                     // 准备参数
-                    // TODO 无法解析参数不要炸，返回空白(输出错误日志)
-                    Object[] params = ParameterInject.resolve(null, Arrays.asList(sender, command, args, this), Arrays.asList(tmp), subCommandInfo.getMethod().getParameters());
+                    Object[] params;
+                    try {
+                        params = ParameterInject.resolve(null, Arrays.asList(sender, command, args, this, subCommandInfo, subCommandInfo.getCommand(), tabCompleteInfo, tabCompleteInfo.getTabCompleter()), Arrays.asList(tmp), subCommandInfo.getMethod().getParameters());
+                    } catch (CanNotResolveParameterException e) {
+                        // 如果参数解析失败则返回空白
+                        return Collections.emptyList();
+                    }
 
                     try {
                         // 执行补全器，获取结果并返回
-                        return Reflects.conv(method.invoke(subCommandInfo.getBean(), params));
+                        return Reflects.conv(tabCompleteInfo.getMethod().invoke(subCommandInfo.getBean(), params));
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         // 如果出现了任何异常则返回空白，并打印异常信息
                         e.printStackTrace();
@@ -258,6 +263,49 @@ public class CommandManager implements IManager, TabExecutor {
     @Nonnull
     public Map<String, Command> getCommands() {
         return Collections.unmodifiableMap(this.commands);
+    }
+
+    /**
+     * 注册一个命令
+     * @param bean 方法所在的类的实例
+     * @param method 命令的执行方法
+     * @param annotation 命令的注解
+     */
+    private void register(@Nonnull Object bean, @Nonnull Method method, @Nonnull Command annotation) {
+        // 注册 name
+        String name = annotation.name();
+        if (Strings.isEmpty(name)) {
+            name = method.getName();
+        }
+        name = name.toLowerCase();
+
+        this.register(name, name, annotation, method, bean);
+
+        // 保存命令的信息
+        this.commands.put(name, annotation);
+
+        // 注册 alias
+        for (String alias : annotation.aliases()) {
+            this.register(name, alias, annotation, method, bean);
+        }
+    }
+
+    /**
+     * 注册一个命令的 Tab 补全器
+     * @param bean 方法所在的类的实例
+     * @param method 补全器的执行方法
+     * @param annotation 补全器的注解
+     */
+    private void register(@Nonnull Object bean, @Nonnull Method method, @Nonnull TabCompleter annotation) {
+        // 注册 name
+        String name = annotation.name();
+        if (Strings.isEmpty(name)) {
+            name = method.getName();
+        }
+        name = name.toLowerCase();
+
+        // 保存补全器的信息
+        this.tabCompletes.put(name, new TabCompleteInfo(this.commandInfos.get(name), method, annotation, bean));
     }
 
     /**

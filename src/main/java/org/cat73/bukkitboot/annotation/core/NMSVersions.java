@@ -13,5 +13,5 @@ public @interface NMSVersions {
     /**
      * @return NMSVersion 版本列表
      */
-    NMSVersion[] value() default {};
+    NMSVersion[] value();
 }

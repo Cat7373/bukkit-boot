@@ -13,5 +13,5 @@ public @interface Scheduleds {
     /**
      * @return NMSVersion 版本列表
      */
-    Scheduled[] value() default {};
+    Scheduled[] value();
 }

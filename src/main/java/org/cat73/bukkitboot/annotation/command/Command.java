@@ -13,11 +13,11 @@ import java.lang.annotation.*;
  * <p>所需参数会自动注入</p>
  * <!-- TODO 说明可注入的东西 -->
  */
-// TODO 允许多个
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = ElementType.METHOD)
 @Documented
 @Inherited
+@Repeatable(Commands.class)
 public @interface Command {
     /**
      * 命令的名字
