@@ -1,4 +1,4 @@
-package org.cat73.bukkitboot.annotation.core;
+package org.cat73.bukkitboot.annotation.core.condition;
 
 import org.cat73.bukkitboot.util.reflect.NMS;
 

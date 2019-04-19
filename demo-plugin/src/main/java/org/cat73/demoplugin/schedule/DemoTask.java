@@ -7,7 +7,7 @@ import org.cat73.bukkitboot.util.Logger;
 @Bean
 public class DemoTask {
     @Scheduled
-    @Scheduled(delay = 5)
+    @Scheduled(delay = 5 * 20)
     public void once() {
         Logger.debug("DemoTask.once()");
     }

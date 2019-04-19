@@ -4,7 +4,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.cat73.bukkitboot.annotation.schedule.Scheduled;
-import org.cat73.bukkitboot.annotation.schedule.Scheduleds;
 import org.cat73.bukkitboot.context.IManager;
 import org.cat73.bukkitboot.context.PluginContext;
 import org.cat73.bukkitboot.util.Lang;
@@ -25,12 +24,8 @@ public class ScheduleManager implements IManager {
 
     @Override
     public void register(@Nonnull PluginContext context, @Nonnull Object bean) {
-        Reflects.lookupMethodByAnnotation(bean.getClass(), Scheduled.class, (m, a) -> this.register(context, bean, m, a));
-        Reflects.lookupMethodByAnnotation(bean.getClass(), Scheduleds.class, (m, a) -> {
-            for (Scheduled annotation : a.value()) {
-                this.register(context, bean, m, annotation);
-            }
-        });
+        Reflects.lookupMethodByAnnotation(bean.getClass(), Scheduled.class, (method, annotation) ->
+                this.register(context, bean, method, annotation));
     }
 
     /**

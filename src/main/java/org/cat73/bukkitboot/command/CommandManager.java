@@ -8,9 +8,7 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabExecutor;
 import org.cat73.bukkitboot.BukkitBoot;
 import org.cat73.bukkitboot.annotation.command.Command;
-import org.cat73.bukkitboot.annotation.command.Commands;
 import org.cat73.bukkitboot.annotation.command.TabCompleter;
-import org.cat73.bukkitboot.annotation.command.TabCompleters;
 import org.cat73.bukkitboot.command.internal.HelpCommand;
 import org.cat73.bukkitboot.context.IManager;
 import org.cat73.bukkitboot.context.PluginContext;
@@ -53,18 +51,8 @@ public class CommandManager implements IManager, TabExecutor {
     public void register(@Nonnull PluginContext context, @Nonnull Object bean) {
         // 注册命令
         Reflects.lookupMethodByAnnotation(bean.getClass(), Command.class, (method, annotation) -> this.register(bean, method, annotation));
-        Reflects.lookupMethodByAnnotation(bean.getClass(), Commands.class, (method, annotation) -> {
-            for (Command command : annotation.value()) {
-                this.register(bean, method, command);
-            }
-        });
         // 注册 Tab 补全器
         Reflects.lookupMethodByAnnotation(bean.getClass(), TabCompleter.class, (method, annotation) -> this.register(bean, method, annotation));
-        Reflects.lookupMethodByAnnotation(bean.getClass(), TabCompleters.class, (method, annotation) -> {
-            for (TabCompleter tabCompleter : annotation.value()) {
-                this.register(bean, method, tabCompleter);
-            }
-        });
     }
 
     @Override

@@ -88,64 +88,76 @@ public final class Reflects {
 
     /**
      * 遍历类中的所有方法，寻找被指定注解修饰的字段，并对它们做一些操作
+     * <p>对于 Repeatable 注解，存在多个时会多次调用 action</p>
      * @param clazz 用做遍历的类
      * @param annotationClazz 要查找的注解
      * @param action 要进行的操作
-     * @param <T> 注解的类型
+     * @param <A> 注解的类型
      */
-    public static <T extends Annotation> void lookupFieldByAnnotation(@Nonnull Class<?> clazz, @Nonnull Class<T> annotationClazz, @Nonnull Lang.ThrowableBiConsumer<Field, T> action) {
+    public static <A extends Annotation> void lookupFieldByAnnotation(@Nonnull Class<?> clazz, @Nonnull Class<A> annotationClazz, @Nonnull Lang.ThrowableBiConsumer<Field, A> action) {
         lookupFields(clazz, f -> {
-            T annotation = f.getAnnotation(annotationClazz);
-            if (annotation != null) {
-                action.wrap().accept(f, annotation);
+            A[] annotations = f.getAnnotationsByType(annotationClazz);
+            if (annotations.length > 0) {
+                for (A annotation : annotations) {
+                    action.wrap().accept(f, annotation);
+                }
             }
         });
     }
 
     /**
      * 遍历类中的所有方法，寻找被指定注解修饰的方法，并对它们做一些操作
+     * <p>对于 Repeatable 注解，存在多个时会多次调用 action</p>
      * @param clazz 用做遍历的类
      * @param annotationClazz 要查找的注解
      * @param action 要进行的操作
-     * @param <T> 注解的类型
+     * @param <A> 注解的类型
      */
-    public static <T extends Annotation> void lookupMethodByAnnotation(@Nonnull Class<?> clazz, @Nonnull Class<T> annotationClazz, @Nonnull Lang.ThrowableBiConsumer<Method, T> action) {
+    public static <A extends Annotation> void lookupMethodByAnnotation(@Nonnull Class<?> clazz, @Nonnull Class<A> annotationClazz, @Nonnull Lang.ThrowableBiConsumer<Method, A> action) {
         lookupMethods(clazz, m -> {
-            T annotation = m.getAnnotation(annotationClazz);
-            if (annotation != null) {
-                action.wrap().accept(m, annotation);
-            }
-        });
-    }
-
-    /**
-     * 遍历类中的所有方法(包括私有)，寻找被指定注解修饰的方法，并对它们做一些操作
-     * @param clazz 用做遍历的类
-     * @param annotationClazz 要查找的注解
-     * @param action 要进行的操作
-     * @param <T> 注解的类型
-     */
-    public static <T extends Annotation> void lookupDeclaredMethodByAnnotation(@Nonnull Class<?> clazz, @Nonnull Class<T> annotationClazz, @Nonnull Lang.ThrowableBiConsumer<Method, T> action) {
-        lookupDeclaredMethods(clazz, m -> {
-            T annotation = m.getAnnotation(annotationClazz);
-            if (annotation != null) {
-                action.wrap().accept(m, annotation);
+            A[] annotations = m.getAnnotationsByType(annotationClazz);
+            if (annotations.length > 0) {
+                for (A annotation : annotations) {
+                    action.wrap().accept(m, annotation);
+                }
             }
         });
     }
 
     /**
      * 遍历类中的所有字段(包括私有)，寻找被指定注解修饰的字段，并对它们做一些操作
+     * <p>对于 Repeatable 注解，存在多个时会多次调用 action</p>
      * @param clazz 用做遍历的类
      * @param annotationClazz 要查找的注解
      * @param action 要进行的操作
-     * @param <T> 注解的类型
+     * @param <A> 注解的类型
      */
-    public static <T extends Annotation> void lookupDeclaredFieldByAnnotation(@Nonnull Class<?> clazz, @Nonnull Class<T> annotationClazz, @Nonnull Lang.ThrowableBiConsumer<Field, T> action) {
+    public static <A extends Annotation> void lookupDeclaredFieldByAnnotation(@Nonnull Class<?> clazz, @Nonnull Class<A> annotationClazz, @Nonnull Lang.ThrowableBiConsumer<Field, A> action) {
         lookupDeclaredFields(clazz, f -> {
-            T annotation = f.getAnnotation(annotationClazz);
-            if (annotation != null) {
-                action.wrap().accept(f, annotation);
+            A[] annotations = f.getAnnotationsByType(annotationClazz);
+            if (annotations.length > 0) {
+                for (A annotation : annotations) {
+                    action.wrap().accept(f, annotation);
+                }
+            }
+        });
+    }
+
+    /**
+     * 遍历类中的所有方法(包括私有)，寻找被指定注解修饰的方法，并对它们做一些操作
+     * <p>对于 Repeatable 注解，存在多个时会多次调用 action</p>
+     * @param clazz 用做遍历的类
+     * @param annotationClazz 要查找的注解
+     * @param action 要进行的操作
+     * @param <A> 注解的类型
+     */
+    public static <A extends Annotation> void lookupDeclaredMethodByAnnotation(@Nonnull Class<?> clazz, @Nonnull Class<A> annotationClazz, @Nonnull Lang.ThrowableBiConsumer<Method, A> action) {
+        lookupDeclaredMethods(clazz, m -> {
+            A[] annotations = m.getAnnotationsByType(annotationClazz);
+            if (annotations.length > 0) {
+                for (A annotation : annotations) {
+                    action.wrap().accept(m, annotation);
+                }
             }
         });
     }

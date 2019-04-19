@@ -14,7 +14,7 @@ fun includeProjects() {
                 include(":$it")
             }
 
-    println("includeProjects completes.")
+    println("includeProjects complete.")
 }
 
 includeProjects()

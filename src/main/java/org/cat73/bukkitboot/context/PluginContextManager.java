@@ -3,6 +3,8 @@ package org.cat73.bukkitboot.context;
 import org.bukkit.plugin.Plugin;
 import org.cat73.bukkitboot.BukkitBoot;
 import org.cat73.bukkitboot.annotation.core.*;
+import org.cat73.bukkitboot.annotation.core.condition.NMSVersion;
+import org.cat73.bukkitboot.annotation.core.condition.NMSVersions;
 import org.cat73.bukkitboot.context.bean.BeanInfo;
 import org.cat73.bukkitboot.util.Lang;
 import org.cat73.bukkitboot.util.reflect.NMS;
