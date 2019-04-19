@@ -19,6 +19,9 @@ extra["dependencyNames"] = mapOf(
 subprojects {
     apply(plugin = "org.gradle.java-library")
 
+    group = "org.cat73.bukkitboot"
+    version = "1.0.0-SNAPSHOT"
+
     // Java 版本
     configure<JavaPluginConvention> {
         val javaVersion = JavaVersion.VERSION_1_8
