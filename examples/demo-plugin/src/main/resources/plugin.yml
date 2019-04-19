@@ -1,0 +1,9 @@
+name: Bukkit-Boot-Demo
+version: 1.0.0
+main: org.cat73.demoplugin.BukkitBootDemo
+authors: [Cat73]
+website: https://github.com/Cat7373/Bukkit-Boot
+depends: [Bukkit-Boot]
+commands:
+  bukkitbootdemo:
+    usage: /<command> help

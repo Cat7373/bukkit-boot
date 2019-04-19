@@ -1,0 +1,14 @@
+map:
+  list:
+    - 1
+    - 2
+    - 3
+  str: Hello World!
+  int: 123
+  float: 123.0
+  bool: true
+  maplist:
+    - p1: 111
+      p2: 222
+    - p1: 333
+      p2: 444
