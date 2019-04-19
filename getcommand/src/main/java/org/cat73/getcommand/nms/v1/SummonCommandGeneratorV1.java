@@ -2,7 +2,7 @@ package org.cat73.getcommand.nms.v1;
 
 import org.bukkit.entity.Entity;
 import org.cat73.bukkitboot.annotation.core.Bean;
-import org.cat73.bukkitboot.annotation.core.condition.NMSVersion;
+import org.cat73.bukkitboot.annotation.core.condition.ConditionalOnNMSVersion;
 import org.cat73.bukkitboot.util.reflect.NMS;
 import org.cat73.bukkitboot.util.reflect.Reflects;
 import org.cat73.getcommand.nms.ISummonCommandGenerator;
@@ -15,11 +15,7 @@ import java.util.Map;
  * <p>支持 1.8.3 ~ 1.10.2</p>
  */
 @Bean
-@NMSVersion(NMS.v1_8_R2)
-@NMSVersion(NMS.v1_8_R3)
-@NMSVersion(NMS.v1_9_R1)
-@NMSVersion(NMS.v1_9_R2)
-@NMSVersion(NMS.v1_10_R1)
+@ConditionalOnNMSVersion({NMS.v1_8_R2, NMS.v1_8_R3, NMS.v1_9_R1, NMS.v1_9_R2, NMS.v1_10_R1})
 public class SummonCommandGeneratorV1 implements ISummonCommandGenerator {
     @Override
     public String generator(Entity entity) throws Exception {

@@ -3,7 +3,7 @@ package org.cat73.getcommand.nms.v1;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.cat73.bukkitboot.annotation.core.Bean;
-import org.cat73.bukkitboot.annotation.core.condition.NMSVersion;
+import org.cat73.bukkitboot.annotation.core.condition.ConditionalOnNMSVersion;
 import org.cat73.bukkitboot.util.reflect.NMS;
 import org.cat73.bukkitboot.util.reflect.Reflects;
 import org.cat73.getcommand.nms.ISetBlockCommandGenerator;
@@ -14,8 +14,7 @@ import org.cat73.getcommand.util.NBT2YamlUtil;
  * <p>支持 1.8.3 ~ 1.8.8</p>
  */
 @Bean
-@NMSVersion(NMS.v1_8_R2)
-@NMSVersion(NMS.v1_8_R3)
+@ConditionalOnNMSVersion({NMS.v1_8_R2, NMS.v1_8_R3})
 public class SetBlockCommandGeneratorV1 implements ISetBlockCommandGenerator {
     @Override
     public String generator(Block block) throws Exception {

@@ -58,7 +58,7 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-// 依赖
+// 依赖：compileOnly 的依赖注意 CraftBukkit 中要有
 dependencies {
     compileOnly            ("${dependencyNames["bukkit"]}")
     compileOnly            ("${dependencyNames["jsr305"]}")

@@ -4,7 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.cat73.bukkitboot.annotation.core.Bean;
-import org.cat73.bukkitboot.annotation.core.condition.NMSVersion;
+import org.cat73.bukkitboot.annotation.core.condition.ConditionalOnNMSVersion;
 import org.cat73.bukkitboot.util.reflect.NMS;
 import org.cat73.bukkitboot.util.reflect.Reflects;
 import org.cat73.getcommand.nms.IGiveCommandGenerator;
@@ -15,11 +15,7 @@ import org.cat73.getcommand.util.NBT2YamlUtil;
  * <p>支持 1.9 ~ 1.12.2</p>
  */
 @Bean
-@NMSVersion(NMS.v1_9_R1)
-@NMSVersion(NMS.v1_9_R2)
-@NMSVersion(NMS.v1_10_R1)
-@NMSVersion(NMS.v1_11_R1)
-@NMSVersion(NMS.v1_12_R1)
+@ConditionalOnNMSVersion({NMS.v1_9_R1, NMS.v1_9_R2, NMS.v1_10_R1, NMS.v1_11_R1, NMS.v1_12_R1})
 public class GiveCommandGeneratorV2 implements IGiveCommandGenerator {
     @Override
     public String generator(Player player) throws Exception {

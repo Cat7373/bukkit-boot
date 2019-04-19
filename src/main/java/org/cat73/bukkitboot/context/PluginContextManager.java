@@ -3,8 +3,7 @@ package org.cat73.bukkitboot.context;
 import org.bukkit.plugin.Plugin;
 import org.cat73.bukkitboot.BukkitBoot;
 import org.cat73.bukkitboot.annotation.core.*;
-import org.cat73.bukkitboot.annotation.core.condition.NMSVersion;
-import org.cat73.bukkitboot.annotation.core.condition.NMSVersions;
+import org.cat73.bukkitboot.annotation.core.condition.*;
 import org.cat73.bukkitboot.context.bean.BeanInfo;
 import org.cat73.bukkitboot.util.Lang;
 import org.cat73.bukkitboot.util.reflect.NMS;
@@ -124,9 +123,12 @@ public final class PluginContextManager {
             // 注册 Context
             context.registerBean(context);
 
+            // 自定义的判断条件
+            Map<Class<? extends Condition>, Condition> conditionMap = new HashMap<>();
+
             // 循环创建 Bean
             for (Class<?> clazz : context.getPluginAnnotation().classes()) {
-                registerBean(context, clazz);
+                registerBean(context, clazz, conditionMap);
             }
             // 如果启用了自动扫描，则以插件主类为引，进行自动扫描
             if (context.getPluginAnnotation().autoScanPackage()) {
@@ -134,7 +136,7 @@ public final class PluginContextManager {
                     // 如果包含 @Bean 注解，则自动创建这个 Bean
                     Bean annotation = clazz.getAnnotation(Bean.class);
                     if (annotation != null) {
-                        registerBean(context, clazz, annotation.name());
+                        registerBean(context, clazz, annotation.name(), conditionMap);
                     }
                 }
             }
@@ -145,29 +147,65 @@ public final class PluginContextManager {
      * 注册一个 Bean，会判断条件注解如 @NMSVersion，不符合条件时会放弃注册
      * @param context 插件的上下文
      * @param clazz Bean 的 Class
+     * @param conditionMap 自定义判断条件的实例 Map
      */
-    private static void registerBean(@Nonnull PluginContext context, @Nonnull Class<?> clazz) {
+    private static void registerBean(@Nonnull PluginContext context, @Nonnull Class<?> clazz, @Nonnull Map<Class<? extends Condition>, Condition> conditionMap) {
         registerBean(context, clazz, null);
     }
 
     /**
-     * 注册一个 Bean，会判断条件注解如 @NMSVersion，不符合条件时会放弃注册
+     * 注册一个 Bean，会判断条件，不符合条件时会放弃注册
      * @param context 插件的上下文
      * @param clazz Bean 的 Class
      * @param name Bean 的名称
+     * @param conditionMap 自定义判断条件的实例 Map
      */
-    private static void registerBean(@Nonnull PluginContext context, @Nonnull Class<?> clazz, @Nullable String name) {
+    private static void registerBean(@Nonnull PluginContext context, @Nonnull Class<?> clazz, @Nullable String name, @Nonnull Map<Class<? extends Condition>, Condition> conditionMap) {
         // 校验 NMSVersion
-        NMSVersion nmsVersion = clazz.getAnnotation(NMSVersion.class);
-        if (nmsVersion != null && nmsVersion.value() != NMS.CURRENT_NMS_VERSION) {
+        ConditionalOnNMSVersion conditionalOnNmsVersion = clazz.getAnnotation(ConditionalOnNMSVersion.class);
+        if (conditionalOnNmsVersion != null && Arrays.stream(conditionalOnNmsVersion.value())
+                .noneMatch(v -> v == NMS.CURRENT_NMS_VERSION)) {
             return; // 版本不符，放弃注册 Bean
         }
 
-        // 支持多个 NMSVersion 的 Bean，校验是否符合其一
-        NMSVersions nmsVersions = clazz.getAnnotation(NMSVersions.class);
-        if (nmsVersions != null && Arrays.stream(nmsVersions.value())
-                .noneMatch(v -> v.value() == NMS.CURRENT_NMS_VERSION)) {
-            return; // 没有符合的版本，放弃注册 Bean
+        // 校验必须存在的 Class
+        ConditionalOnClass conditionalOnClass = clazz.getAnnotation(ConditionalOnClass.class);
+        if (conditionalOnClass != null) {
+            for (String className : conditionalOnClass.value()) {
+                try {
+                    Class.forName(className);
+                } catch (ClassNotFoundException e) {
+                    return; // Class 不存在，放弃注册 Bean
+                }
+            }
+        }
+
+        // 校验必须不存在的 Class
+        ConditionalOnMissingClass conditionalOnMissingClass = clazz.getAnnotation(ConditionalOnMissingClass.class);
+        if (conditionalOnMissingClass != null) {
+            for (String className : conditionalOnMissingClass.value()) {
+                try {
+                    Class.forName(className);
+                    return; // Class 存在，放弃注册 Bean
+                } catch (ClassNotFoundException e) {
+                    // quiet
+                }
+            }
+        }
+
+        // 自定义的判断条件
+        Conditional conditional = clazz.getAnnotation(Conditional.class);
+        if (conditional != null) {
+            for (Class<? extends Condition> conditionClass : conditional.value()) {
+                Condition condition = conditionMap.get(conditionClass);
+                if (condition == null) {
+                    condition = Reflects.newInstance(conditionClass);
+                    conditionMap.put(conditionClass, condition);
+                }
+                if (!condition.matches(clazz)) {
+                    return; // 不符合条件，放弃注册 Bean
+                }
+            }
         }
 
         // 注册 Bean

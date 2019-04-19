@@ -3,15 +3,16 @@ package org.cat73.bukkitboot.annotation.core.condition;
 import java.lang.annotation.*;
 
 /**
- * 当正在运行的服务器符合指定的 NMS 版本之一时才将类注册为 Bean
+ * 当指定 Class 存在时才将类注册为 Bean
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-public @interface NMSVersions {
+public @interface ConditionalOnClass {
     /**
-     * @return NMSVersion 版本列表
+     * Class 的全路径列表
+     * @return Class 的全路径列表
      */
-    NMSVersion[] value();
+    String[] value();
 }
