@@ -1,7 +1,6 @@
 package org.cat73.bukkitboot.util.reflect;
 
 import org.bukkit.Bukkit;
-
 import javax.annotation.Nonnull;
 
 /**
@@ -59,6 +58,12 @@ public enum NMS {
      * <p>1.13.2</p>
      */
     v1_13_R2,
+    /**
+     * 1.14
+     * <p>1.14.1</p>
+     * <p>1.14.2</p>
+     */
+    v1_14_R1,
     /**
      * 未知
      */

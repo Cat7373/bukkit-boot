@@ -4,6 +4,9 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.cat73.bukkitboot.BukkitBoot;
 import org.cat73.bukkitboot.annotation.core.BukkitBootPlugin;
@@ -11,13 +14,13 @@ import org.cat73.bukkitboot.command.CommandManager;
 import org.cat73.bukkitboot.context.bean.BeanInfo;
 import org.cat73.bukkitboot.listener.ListenerManager;
 import org.cat73.bukkitboot.schedule.ScheduleManager;
+import org.cat73.bukkitboot.util.PlayerSession;
 import org.cat73.bukkitboot.util.Strings;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.security.ProtectionDomain;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * 插件的上下文
@@ -25,7 +28,7 @@ import java.util.stream.Collectors;
 @Data
 @Accessors(chain = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class PluginContext {
+public final class PluginContext implements Listener {
     /**
      * 插件主类的实例
      */
@@ -54,11 +57,16 @@ public final class PluginContext {
     /**
      * Bean 列表
      */
-    private List<BeanInfo> beans = new ArrayList<>();
+    private final List<BeanInfo> beans = new ArrayList<>();
     /**
      * 基于 name 的 Bean 速查表
      */
-    private Map<String, BeanInfo> name2Bean = new HashMap<>();
+    private final Map<String, BeanInfo> name2Bean = new HashMap<>();
+
+    /**
+     * PlayerSessions
+     */
+    private final Map<UUID, PlayerSession> playerSessionMap = new HashMap<>();
 
     /**
      * 注册一个 Bean
@@ -131,5 +139,17 @@ public final class PluginContext {
         ProtectionDomain protectionDomain = plugin.getClass().getProtectionDomain();
 
         return new PluginContext(plugin, pluginAnnotation, protectionDomain);
+    }
+
+    // TODO javadoc
+    @EventHandler
+    public void onPlayerLogout(@Nonnull PlayerQuitEvent event) {
+        this.playerSessionMap.remove(event.getPlayer().getUniqueId());
+    }
+
+    // TODO javadoc
+    @Nonnull
+    public PlayerSession playerSession(@Nonnull UUID uuid) {
+        return this.playerSessionMap.computeIfAbsent(uuid, k -> new PlayerSession());
     }
 }

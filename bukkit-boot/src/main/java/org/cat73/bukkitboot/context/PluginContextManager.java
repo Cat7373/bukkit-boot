@@ -10,15 +10,14 @@ import org.cat73.bukkitboot.util.reflect.NMS;
 import org.cat73.bukkitboot.util.reflect.ParameterInject;
 import org.cat73.bukkitboot.util.reflect.Reflects;
 import org.cat73.bukkitboot.util.reflect.Scans;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
 import java.security.ProtectionDomain;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * 插件上下文的管理器
@@ -150,7 +149,7 @@ public final class PluginContextManager {
      * @param conditionMap 自定义判断条件的实例 Map
      */
     private static void registerBean(@Nonnull PluginContext context, @Nonnull Class<?> clazz, @Nonnull Map<Class<? extends Condition>, Condition> conditionMap) {
-        registerBean(context, clazz, null);
+        registerBean(context, clazz, null, conditionMap);
     }
 
     /**

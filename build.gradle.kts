@@ -3,7 +3,7 @@ plugins {
 }
 
 // ext
-val bukkitVersion =             "1.13.2-R0.1-SNAPSHOT"
+val bukkitVersion =             "1.14-R0.1-SNAPSHOT"
 val lombokVersion =             "1.18.6"
 val jsr305Version =             "3.0.2"
 val junitVersion =              "5.4.1"
