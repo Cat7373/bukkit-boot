@@ -1,8 +1,6 @@
 package org.cat73.bukkitboot.util.reflect;
 
 import org.cat73.bukkitboot.util.Lang;
-
-import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import javax.annotation.Nonnull;
 
 /**
  * 包扫描工具类
@@ -97,11 +96,11 @@ public final class Scans {
 
         // 将类名加载为 Class
         List<Class<?>> classList = new ArrayList<>();
-        for(String className : classNames) {
+        for (String className : classNames) {
             try {
                 classList.add(Class.forName(className));
             } catch (Throwable e) {
-                throw Lang.wrapThrow(e);
+                // quiet
             }
         }
 
